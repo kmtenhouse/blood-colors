@@ -1,4 +1,55 @@
-const ogColors = [
+const trollColors = [
+    {
+        name: "rust",
+        hex: "a10000",
+    },
+    {
+        name: "bronze",
+        hex: "a25203",
+    },
+    {
+        name: "gold",
+        hex: "a1a100",
+    },
+    {
+        name: "lime",
+        hex: "678900",
+    },
+    {
+        name: "olive",
+        hex: "336601",
+    },
+    {
+        name: "jade",
+        hex: "078446"
+    },
+    {
+        name: "teal",
+        hex: "008282"
+    },
+    {
+        name: "cerulean",
+        hex: "004182"
+    },
+    {
+        name: "blue",
+        hex: "0021cb"
+    },
+    {
+        name: "indigo",
+        hex: "440a7f"
+    },
+    {
+        name: "violet",
+        hex: "6a006a"
+    },
+    {
+        name: "fuchsia",
+        hex: "99004d"
+    },
+];
+
+/* const ogColors = [
     {
         name: "red",
         hex: "FF0000",
@@ -83,7 +134,7 @@ const ogColors = [
         g: 0,
         b: 127
     }
-];
+]; */
 
 
 function getRandomColor(colors) {
@@ -113,18 +164,19 @@ function hexToRGB(hex) {
     };
 }
 
-function bestFit(newColor) {
+function bestFit(newColor, colorList) {
     let hex = hexToRGB(newColor);
     let results = [];
+    for(let i=0; i< colorList.length; i++) {
+        let currentColorRGB = hexToRGB(colorList[i].hex);
 
-    for(let i=0; i< ogColors.length; i++) {
         results.push(
             {
-                name: ogColors[i].name,
-                r: ogColors[i].r-hex.r,
-                g: ogColors[i].g-hex.g,
-                b: ogColors[i].b-hex.b,
-                totalDistance: Math.abs( ogColors[i].r-hex.r)+Math.abs(ogColors[i].g-hex.g)+Math.abs(ogColors[i].b-hex.b)
+                name: colorList[i].name,
+                r: currentColorRGB.r-hex.r,
+                g: currentColorRGB.g-hex.g,
+                b: currentColorRGB.b-hex.b,
+                totalDistance: Math.abs( currentColorRGB.r-hex.r)+Math.abs(currentColorRGB.g-hex.g)+Math.abs(currentColorRGB.b-hex.b)
             }
         );   
     }
@@ -178,14 +230,15 @@ function makeCategories(colorList, target) {
 }
 
 
-function placeColor(color) {
+function placeColor(color, colorList) {
     //assumes color is a color object with a name and hex only!
-    const allFits = bestFit(color.hex);
+    const allFits = bestFit(color.hex, colorList);
 
     allFits.forEach(result => {
         console.log(result);
         //get the relevant category
         let target = document.getElementById(result.name);
+        console.log("Targeting: ",target);
         console.log(target);
         let newBox = makeOneBox({
             name: color.name,
@@ -199,14 +252,14 @@ function placeColor(color) {
 //MAIN CODE TO RUN
 //Display our base categories
 let display = document.getElementById("display");
-makeCategories(ogColors, display);
+makeCategories(trollColors, display);
 
 //Test: place all the existing colors
-/* for(color of ogColors) {
-    placeColor(color);
-} */
+/*  for(color of trollColors) {
+    placeColor(color, trollColors);
+}  */
 
 //Now, get a random color and place it
 let rando = getRandomColor(colorNames); //colornames is from another file
-placeColor(rando);
+placeColor(rando, trollColors); 
 
