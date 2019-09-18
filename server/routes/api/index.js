@@ -1,7 +1,8 @@
 "use strict";
 
 const router = require("express").Router();
-const exampleRoutes = require("./examples");
+const colorRoutes = require("./colors");
+const castesRoutes = require("./castes");
 
 //MAIN ROUTES
 //healthcheck route
@@ -9,6 +10,7 @@ router.get("/", (req, res) => {
     res.send("API ROUTES");
   });
 
-router.use("/examples", exampleRoutes);
+router.use("/colors", colorRoutes);
+router.use("/castes", castesRoutes);
 
 module.exports = router;

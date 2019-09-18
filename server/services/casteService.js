@@ -1,21 +1,20 @@
 
-const Example = require("../../database/schema/Example");
+const Caste = require("../../database/schema/caste");
 
 module.exports = {
 
-    findAllExamples: function () {
-        return Example.find({});
+    findAllCastes: function () {
+        return Caste.find({});
     },
 
-    createOne: function (exampleObj) {
+    createOne: function (casteObj) {
+    
         return new Promise((resolve, reject) => {
-            if(!exampleObj || !exampleObj.hasOwnProperty("text") || typeof(exampleObj.text)!=="string") {
-                reject(new Error("Must provide valid text!"))
+            if(!casteObj || !casteObj.hasOwnProperty("name") || typeof(casteObj.name)!=="string" || casteObj.name==="") {
+                reject(new Error("Must provide valid name!"))
             }
-            if(exampleObj.text==="") {
-                reject(new Error("Cannot provide empty string for text!"));
-            }
-            Example.create(exampleObj)
+
+            Caste.create(casteObj)
                 .then(result=>resolve(result))
                 .catch(err=>reject(err));
         });
@@ -29,7 +28,7 @@ module.exports = {
             if (!checkForHexRegExp.test(id)) {
                 reject(new Error("Must be a valid id format"));
             }
-            Example.deleteOne({ _id: id })
+            Caste.deleteOne({ _id: id })
                 .then(result => {
                     if(!result || result.deletedCount === 0) {
                         reject(new Error("Not Found"))
