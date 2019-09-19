@@ -11,7 +11,7 @@ function Collection(props) {
     } 
     //otherwise, loop through and make lots of tiny colorboxes :)
     return(
-        props.colors.map( (color, index) => (props.tier===color.tier ? <Colorbox key={index} name={color.name} hex={color.hex}></Colorbox> : '') )
+        props.colors.map( (color, index) => (props.tier===color.tier ? <Colorbox size="thumbnail" key={index} name={color.name} hex={color.hex}></Colorbox> : '') )
     );
 }
 

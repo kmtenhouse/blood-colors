@@ -1,7 +1,10 @@
 .colorbox {
-    height: 50px;
-    width: 50px;
+    height: 100px;
+    width: 100px;
     border: 1px solid black;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .colorbox--large {
@@ -9,7 +12,7 @@
     width: 100px;
 }
 
-.colorbox:hover {
+.colorbox--thumbnail:hover {
     transform: scale(2);
     transition: all 0.3s ease-in-out;
 }

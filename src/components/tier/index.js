@@ -3,14 +3,20 @@ import './tier.css';
 import Colorbox from '../colorbox';
 
 function Tier(props) {
+  const style = {
+    backgroundColor: "#" + props.hex || "FFFFFF"
+  };
+
   return (
     <div className="tier">
-      <Colorbox size="large" hex={props.hex} />
-      <div className="tier__collection">
-        {props.children}
+      <div className="tier__header" style={style}>
+        <h6>{props.name}</h6>
       </div>
-    </div>
-  );
-}
-
-export default Tier;
+      <div className="tier__collection">
+          {props.children}
+        </div>
+      </div>
+      );
+    }
+    
+    export default Tier;
