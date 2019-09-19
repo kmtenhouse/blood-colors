@@ -9,7 +9,7 @@ import castes from './data/hemospectrum-colors';
 import allColors from './data/all-colors';
 import canonTrolls from './data/canon-trolls';
 import { hexToHSL, hexToRGB } from './utils/hex-conversion';
-
+import Form from './components/Form';
 
 
 class App extends React.Component {
@@ -53,8 +53,10 @@ class App extends React.Component {
   getRGBFit(color) {
     let currentCastes = [].concat(this.state.tierColors, this.state.offSpecColors);
     let colorHex = hexToRGB(color.hex);
+    let colorHSL = hexToHSL(color.hex);
     let results = currentCastes.map(caste => {
       let casteHex = hexToRGB(caste.hex);
+      let casteHSL = hexToHSL(caste.hex);
       return {
         tier: caste.name,
         totalDistance: Math.abs(casteHex.r - colorHex.r) + Math.abs(casteHex.g - colorHex.g) + Math.abs(casteHex.b - colorHex.b)
@@ -65,8 +67,8 @@ class App extends React.Component {
 
     //check for any dupes;
     let bestMatch = results[0].totalDistance;
-    let allMatches = results.filter(result => result.totalDistance===bestMatch);
-    
+    let allMatches = results.filter(result => result.totalDistance === bestMatch);
+
     return (allMatches.length === 1 ? results[0].tier : "indeterminate");
 
   }
@@ -81,20 +83,27 @@ class App extends React.Component {
     this.setState({ colors: colorsToDistro });
   }
 
+  handleChange(e) {
+    e.preventDefault();
+    let { name, value } = e.target;
+    this.setState({ [name]: value });
+  }
 
   render() {
     return (
       <Container>
+        <Form casteName={this.state.casteName} onChange={this.handleChange} />
+
         <h2>Can't Determine</h2>
         <Tier name="indeterminate" hex="FFFFFF">
-   
+
           <Collection tier="indeterminate" colors={this.state.colors} />
         </Tier>
         <h2>Hemospectrum</h2>
         {
           this.state.tierColors.map((caste, index) => (
             <Tier name={caste.tier} key={index} hex={caste.hex}>
-            
+
               <Collection tier={caste.tier} colors={this.state.colors} />
             </Tier>
           ))
@@ -102,7 +111,7 @@ class App extends React.Component {
         <h2>Off-Spectrum</h2>
         {
           this.state.offSpecColors.map((caste, index) => (
-            <Tier name={caste.tier} key={index}  hex={caste.hex}>
+            <Tier name={caste.tier} key={index} hex={caste.hex}>
               <Collection tier={caste.tier} colors={this.state.colors} />
             </Tier>
           ))

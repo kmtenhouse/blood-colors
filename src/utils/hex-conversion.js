@@ -79,8 +79,7 @@ export function hexToHSL(hex) {
     return {
         h: h,
         s: s,
-        l: l,
-        hslString: `hsl(${h}, ${s}%, ${l}%)`
+        l: l
     };
 }
 
