@@ -10,7 +10,7 @@ function Tier(props) {
   return (
     <div className="tier">
       <div className="tier__header" style={style}>
-        <h6>{props.name}</h6>
+        
       </div>
       <div className="tier__collection">
           {props.children}
