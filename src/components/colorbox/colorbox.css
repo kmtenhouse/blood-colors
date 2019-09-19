@@ -1,0 +1,10 @@
+.colorbox {
+    height: 25px;
+    width: 25px;
+}
+
+.colorbox--large {
+    height: 100px;
+    width: 100px;
+}
+

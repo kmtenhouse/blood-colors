@@ -3,13 +3,20 @@ import logo from './logo.svg';
 import './App.css';
 import Tier from './components/tier';
 import Container from './components/container';
+import Colorbox from './components/colorbox';
+import castes from './data/hemospectrum-colors';
 
 function App() {
   return (
     <Container>
-      <Tier>
-        <p>Test</p>
-      </Tier>
+      {
+        castes.map(caste => (
+        <Tier name={caste[1]}>
+          <Colorbox size="large" hex={caste[0]}></Colorbox>
+        </Tier>
+        ))
+      }
+
     </Container>
   );
 }

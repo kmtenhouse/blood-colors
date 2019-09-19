@@ -4,7 +4,9 @@ import './tier.css';
 function Tier(props) {
   return (
     <div className="tier">
-      {props.children}
+      <div className="tier__body">
+        {props.children}
+      </div>
     </div>
   );
 }
