@@ -1565,5 +1565,7 @@ const colorNames = [
     ["FFFFB4", "Portafino"],
     ["FFFFF0", "Ivory"],
     ["FFFFFF", "White"]
-    ]
+    ];
+
+    export default colorNames;
     
