@@ -9,9 +9,6 @@ function Collection(props) {
             </div>
         );
     } 
-
-    console.log(props);
-    console.log(props.tier);
     //otherwise, loop through and make lots of tiny colorboxes :)
     return(
         props.colors.map( (color, index) => (props.tier===color.tier ? <Colorbox key={index} hex={color.hex}></Colorbox> : '') )
