@@ -1,8 +1,12 @@
 .tier {
-    display: flex;
-    flex-direction: row;
     border: 1px solid black;
     min-height: 100px;
     width: 100%;
     margin: 1em 2em;
+}
+
+.tier__collection {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }

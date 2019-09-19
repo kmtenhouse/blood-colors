@@ -8,7 +8,7 @@ function Colorbox(props) {
 
   return (
     <div className={props.size==='large' ? "colorbox colorbox--large" : "colorbox" } style={style}>
-      {props.children}
+      <p>{(props.name ? props.name : '')}</p>
     </div>
   );
 }

@@ -86,15 +86,15 @@ class App extends React.Component {
     return (
       <Container>
         <h2>Can't Determine</h2>
-        <Tier name="indeterminate">
-          <Colorbox size="large" hex="FFFFFF" />
+        <Tier name="indeterminate" hex="FFFFFF">
+   
           <Collection tier="indeterminate" colors={this.state.colors} />
         </Tier>
         <h2>Hemospectrum</h2>
         {
           this.state.tierColors.map((caste, index) => (
-            <Tier name={caste.tier} key={index}>
-              <Colorbox size="large" hex={caste.hex} />
+            <Tier name={caste.tier} key={index} hex={caste.hex}>
+            
               <Collection tier={caste.tier} colors={this.state.colors} />
             </Tier>
           ))
@@ -102,8 +102,7 @@ class App extends React.Component {
         <h2>Off-Spectrum</h2>
         {
           this.state.offSpecColors.map((caste, index) => (
-            <Tier name={caste.tier} key={index}>
-              <Colorbox size="large" hex={caste.hex} />
+            <Tier name={caste.tier} key={index}  hex={caste.hex}>
               <Collection tier={caste.tier} colors={this.state.colors} />
             </Tier>
           ))
