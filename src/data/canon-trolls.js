@@ -9,7 +9,8 @@ const canonTrolls = [
     ["0021cb",  "Equius"],
     ["440a7f",  "Gamzee"],
     ["6a006a",  "Eridan"],
-    ["99004d",  "Feferi"]
+    ["99004d",  "Feferi"],
+    ["FF0000", "Karkat"]
 ];
 
 export default canonTrolls;

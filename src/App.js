@@ -6,7 +6,7 @@ import Colorbox from './components/colorbox';
 import Collection from './components/collection';
 import offSpec from './data/off-spectrum';
 import castes from './data/hemospectrum-colors';
-//import allColors from './data/all-colors';
+import allColors from './data/all-colors';
 import canonTrolls from './data/canon-trolls';
 import { hexToHSL, hexToRGB } from './utils/hex-conversion';
 
@@ -16,14 +16,6 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      tierColors: [],
-      offSpec: [],
-      colors: []
-    };
-  }
-
-  componentDidMount() {
     let casteColors = castes.map(caste => {
       let currCaste = this.createColorObject(caste);
       currCaste.tier = caste[1];
@@ -36,16 +28,16 @@ class App extends React.Component {
       return currCaste;
     });
 
-
-
-    this.setState({
+    this.state = {
       tierColors: casteColors,
-      offSpectrumColors: offColors
-    });
+      offSpecColors: offColors,
+      colors: []
+    };
+  }
 
-    console.log(this.state);
-    this.distributeColors();
-
+  componentDidMount() {
+    this.distributeColors(canonTrolls);
+    this.distributeColors(allColors);
   }
 
   createColorObject(color) {
@@ -57,60 +49,62 @@ class App extends React.Component {
     return newObj;
   }
 
-  
   //looks at our current tiers to determine where to distribute
   getRGBFit(color) {
-    let currentCastes = this.state.tierColors;
-    console.log("ucrrent tiers", currentCastes);
+    let currentCastes = [].concat(this.state.tierColors, this.state.offSpecColors);
     let colorHex = hexToRGB(color.hex);
-    console.log(colorHex);
     let results = currentCastes.map(caste => {
       let casteHex = hexToRGB(caste.hex);
-      console.log(caste.name);
       return {
         tier: caste.name,
-        totalDistance: Math.abs(casteHex.r-colorHex.r)+Math.abs(casteHex.g-colorHex.g)+Math.abs(casteHex.b-colorHex.b)
+        totalDistance: Math.abs(casteHex.r - colorHex.r) + Math.abs(casteHex.g - colorHex.g) + Math.abs(casteHex.b - colorHex.b)
       };
     });
 
-    console.log("result:",results);
-    results = results.sort((a,b) => b.totalDistance > a.totalDistance );
-    //to-do: put in offspec stuff
-    return results[0];
+    results = results.sort((a, b) => (a.totalDistance > b.totalDistance ? 1 : -1));
+
+    //check for any dupes;
+    let bestMatch = results[0].totalDistance;
+    let allMatches = results.filter(result => result.totalDistance===bestMatch);
+    
+    return (allMatches.length === 1 ? results[0].tier : "indeterminate");
 
   }
 
-  distributeColors() {
+  distributeColors(arr) {
     //grab the current colors from state
-    let colorsToDistro = canonTrolls.map(troll => this.createColorObject(troll));
-    
-    colorsToDistro.forEach(swatch=>{
+    let colorsToDistro = arr.map(troll => this.createColorObject(troll));
+
+    colorsToDistro.forEach(swatch => {
       swatch.tier = this.getRGBFit(swatch);
     });
-    console.log(colorsToDistro);
-    //this.setState({colors: currentSwatches});
+    this.setState({ colors: colorsToDistro });
   }
 
 
   render() {
     return (
       <Container>
+        <h2>Can't Determine</h2>
+        <Tier name="indeterminate">
+          <Colorbox size="large" hex="FFFFFF" />
+          <Collection tier="indeterminate" colors={this.state.colors} />
+        </Tier>
+        <h2>Hemospectrum</h2>
         {
           this.state.tierColors.map((caste, index) => (
             <Tier name={caste.tier} key={index}>
-              <Colorbox size="large" hex={caste.hex}>
-              </Colorbox>
+              <Colorbox size="large" hex={caste.hex} />
               <Collection tier={caste.tier} colors={this.state.colors} />
             </Tier>
           ))
         }
-
+        <h2>Off-Spectrum</h2>
         {
-          this.state.offSpec.map((caste, index) => (
-            <Tier name={caste[1]} key={index}>
-              <Colorbox size="large" hex={caste[0]}>
-              </Colorbox>
-              <Collection colors={this.state.colors} />
+          this.state.offSpecColors.map((caste, index) => (
+            <Tier name={caste.tier} key={index}>
+              <Colorbox size="large" hex={caste.hex} />
+              <Collection tier={caste.tier} colors={this.state.colors} />
             </Tier>
           ))
         }
