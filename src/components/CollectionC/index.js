@@ -1,6 +1,5 @@
 import React from 'react';
-import './collection.css';
-import Colorbox from '../colorbox';
+import Colorbox from '../ColorboxC';
 
 function Collection(props) {
     if(!props.colors || props.colors.length===0) {
