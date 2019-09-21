@@ -1,6 +1,5 @@
 import React from 'react';
 import './tier.css';
-import Colorbox from '../colorbox';
 
 function Tier(props) {
   const style = {

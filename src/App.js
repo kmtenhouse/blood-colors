@@ -2,7 +2,6 @@ import React from 'react';
 import './App.css';
 import Tier from './components/tier';
 import Container from './components/container';
-import Colorbox from './components/colorbox';
 import Collection from './components/collection';
 import offSpec from './data/off-spectrum';
 import castes from './data/hemospectrum-colors';
@@ -53,10 +52,10 @@ class App extends React.Component {
   getRGBFit(color) {
     let currentCastes = [].concat(this.state.tierColors, this.state.offSpecColors);
     let colorHex = hexToRGB(color.hex);
-    let colorHSL = hexToHSL(color.hex);
+
     let results = currentCastes.map(caste => {
       let casteHex = hexToRGB(caste.hex);
-      let casteHSL = hexToHSL(caste.hex);
+
       return {
         tier: caste.name,
         totalDistance: Math.abs(casteHex.r - colorHex.r) + Math.abs(casteHex.g - colorHex.g) + Math.abs(casteHex.b - colorHex.b)
@@ -89,11 +88,11 @@ class App extends React.Component {
     this.setState({ [name]: value });
   }
 
+ 
   render() {
     return (
       <Container>
-        <Form casteName={this.state.casteName} onChange={this.handleChange} />
-
+        <Form />
         <h2>Can't Determine</h2>
         <Tier name="indeterminate" hex="FFFFFF">
 
@@ -103,7 +102,6 @@ class App extends React.Component {
         {
           this.state.tierColors.map((caste, index) => (
             <Tier name={caste.tier} key={index} hex={caste.hex}>
-
               <Collection tier={caste.tier} colors={this.state.colors} />
             </Tier>
           ))

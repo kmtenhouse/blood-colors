@@ -3,10 +3,13 @@ import './form.css';
 
 function Form(props) {
   return (
-    <div>
-      <input type="input" value={props.casteName} onChange={props.handleOnChange} />
-      <p>{props.casteName}</p>
-    </div>
+    <form>
+      <label>
+        Name:
+      <input type="text" name="name" />
+      </label>
+      <input type="submit" value="Submit" />
+    </form>
   );
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import './colorbox.css';
-import { textContrast, hexToHSL } from '../../utils/hex-conversion';
+import { textContrast } from '../../utils/hex-conversion';
 
 
 function Colorbox(props) {
@@ -8,8 +8,6 @@ function Colorbox(props) {
     backgroundColor: "#" + props.hex || "transparent",
     color: "#" + textContrast(props.hex) || "000000"
   };
-
-  let hsl=(props.hex ? hexToHSL(props.hex) : null);
 
 
   return (
