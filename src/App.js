@@ -1,9 +1,9 @@
 import React from 'react';
 import './App.css';
-import Tier from './components/TierC';
-import Container from './components/ContainerC';
-import Collection from './components/CollectionC';
-import Title from './components/TitleC';
+import Tier from './components/Tier';
+import Container from './components/Container';
+import Collection from './components/Collection';
+import Title from './components/Title';
 import offSpec from './data/off-spectrum';
 import castes from './data/hemospectrum-colors';
 import allColors from './data/all-colors';
