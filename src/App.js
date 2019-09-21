@@ -97,28 +97,31 @@ class App extends React.Component {
       //NOTE: use an old-school for loop because we might break it early
       for (let i = 0; i < castes.length; i++) {
         //calculate the YUV diffs
-        let yDiff = Math.abs(currColorYUV.y - castes[i].yuv.y);
-        let uDiff = Math.abs(currColorYUV.u - castes[i].yuv.u);
-        let vDiff = Math.abs(currColorYUV.v - castes[i].yuv.v);
+        let yDiff = (castes[i].yuv.y - currColorYUV.y)*1;
+        let uDiff = (castes[i].yuv.u - currColorYUV.u)*0.25;
+        let vDiff = (castes[i].yuv.v - currColorYUV.v)*0.25;
         let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
 
         //calculate the RGB diffs
-        let rDiff = Math.abs(currColorRGB.r - castes[i].rgb.r);
-        let gDiff = Math.abs(currColorRGB.g - castes[i].rgb.g);
-        let bDiff = Math.abs(currColorRGB.b - castes[i].rgb.b);
-        //let totalRGBFit = rDiff + gDiff + bDiff; 
-        let totalRGBFit = Math.sqrt(Math.pow(rDiff, 2)+Math.pow(gDiff,2)+Math.pow(bDiff,2));
-   
-        if (color.fit === null || totalRGBFit < color.fit) {
-          //check if it's within our rgb constraints
-          if (totalRGBFit < 80 && vDiff < 10 && uDiff < 23.05) {
-            color.fit = totalRGBFit;
+        let rDiff = castes[i].rgb.r - currColorRGB.r;
+        let gDiff = castes[i].rgb.g - currColorRGB.g;
+        let bDiff = castes[i].rgb.b - currColorRGB.b;
+        let totalRGBFit = Math.sqrt(Math.pow(rDiff, 2) + Math.pow(gDiff, 2) + Math.pow(bDiff, 2));
+
+        let totalFit = totalRGBFit + totalYUVFit;
+
+        if (color.fit === null || totalFit < color.fit) {
+          if (totalFit < 90 && totalRGBFit < 100) {
+            //check if it's within our rgb constraints
+            color.fit = totalFit;
             color.caste = castes[i].name;
-            color.y = yDiff; //currColorYUV.y;
-            color.u = uDiff; //currColorYUV.u;
-            color.v = vDiff; //currColorYUV.v;
+            color.y = yDiff;
+            color.u = uDiff;
+            color.v = vDiff;
+            color.rgbDiff = totalRGBFit;
+            color.yuvDiff = totalYUVFit;
           }
-        } else if (color.fit === totalRGBFit) { //if we find any dupes, make this indeterminate!
+        } else if (color.fit === totalFit) { //if we find any dupes, make this indeterminate!
           color.caste = 'indeterminate';
           color.fit = null;
           break;
