@@ -15,26 +15,35 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    let casteColors = castes.map(caste => {
+    //castes are (currently) defined as a color object with a caste name and a boolean, on-spec or off-spec
+    //first, go through all approved colors and make sure they're on spec...
+    let onSpecCaste = castes.map(caste => {
       let currCaste = this.createColorObject(caste);
       currCaste.tier = caste[1];
+      currCaste.onSpec = true;
       return currCaste;
     });
 
-    let offColors = offSpec.map(caste => {
+    //...then do the opposite with offspec
+    let offSpecCaste = offSpec.map(caste => {
       let currCaste = this.createColorObject(caste);
       currCaste.tier = caste[1];
+      currCaste.onSpec = false;
       return currCaste;
     });
+
+    //join those together and set in the state
+    const allCastes = [].concat(onSpecCaste, offSpecCaste);
 
     this.state = {
-      tierColors: casteColors,
-      offSpecColors: offColors,
-      colors: []
+      castes: allCastes,
+      colors: [] //and no colors to distro just yet
     };
   }
 
   componentDidMount() {
+    //(TO-DO):
+    //long term these will come from the server
     this.distributeColors(canonTrolls);
     this.distributeColors(allColors);
   }
@@ -50,7 +59,7 @@ class App extends React.Component {
 
   //looks at our current tiers to determine where to distribute
   getRGBFit(color) {
-    let currentCastes = [].concat(this.state.tierColors, this.state.offSpecColors);
+    let currentCastes = this.state.castes;
     let colorHex = hexToRGB(color.hex);
 
     let results = currentCastes.map(caste => {
@@ -88,32 +97,36 @@ class App extends React.Component {
     this.setState({ [name]: value });
   }
 
- 
   render() {
     return (
       <Container>
         <Form />
-        <h2>Can't Determine</h2>
+
+        <h2>Hemospectrum</h2>
+        {
+          this.state.castes
+            .filter(caste => caste.onSpec === true)
+            .map((caste, index) => (
+              <Tier name={caste.tier} key={index} hex={caste.hex}>
+                <Collection tier={caste.tier} colors={this.state.colors} />
+              </Tier>
+            ))
+        }
+        <h2>Off-Spectrum</h2>
+        {
+          this.state.castes
+            .filter(caste => caste.onSpec === false)
+            .map((caste, index) => (
+              <Tier name={caste.tier} key={index} hex={caste.hex}>
+                <Collection tier={caste.tier} colors={this.state.colors} />
+              </Tier>
+            ))
+        }
+        <h2>Can't Determine Directly</h2>
         <Tier name="indeterminate" hex="FFFFFF">
 
           <Collection tier="indeterminate" colors={this.state.colors} />
         </Tier>
-        <h2>Hemospectrum</h2>
-        {
-          this.state.tierColors.map((caste, index) => (
-            <Tier name={caste.tier} key={index} hex={caste.hex}>
-              <Collection tier={caste.tier} colors={this.state.colors} />
-            </Tier>
-          ))
-        }
-        <h2>Off-Spectrum</h2>
-        {
-          this.state.offSpecColors.map((caste, index) => (
-            <Tier name={caste.tier} key={index} hex={caste.hex}>
-              <Collection tier={caste.tier} colors={this.state.colors} />
-            </Tier>
-          ))
-        }
       </Container>
     );
   }
