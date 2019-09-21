@@ -10,11 +10,8 @@ function Collection(props) {
         );
     } 
 
-    let colorsToShow = props.colors
-        .filter(color => color.caste===props.caste.name);
-    
     return( 
-        colorsToShow.map( (color, index) => <Colorbox size="thumbnail" key={index} name={color.name} hex={color.hex}></Colorbox> )
+        props.colors.map( (color, index) => <Colorbox size="thumbnail" key={index} name={color.name} hex={color.hex}></Colorbox> )
     );
 }
 

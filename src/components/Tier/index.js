@@ -2,18 +2,14 @@ import React from 'react';
 import './tier.css';
 import { textContrast } from '../../utils/hex-conversion';
 
-function createDeleteButton() {
-  return (
-    <h3 onClick={() => { console.log("clicked") }} className="d-inline-block py-2 px-3">X</h3>
-  );
-}
 
 function Tier(props) {
-  const contrastColor = "#" + textContrast(props.caste.hex);
+  const hex = props.caste.hex || "000000";
+  const contrastColor = "#" + textContrast(hex);
 
   const style = {
-    backgroundColor: "#" + props.caste.hex || "FFFFFF",
-    color: contrastColor || "FFFFFF",
+    backgroundColor: "#" + hex,
+    color: contrastColor,
   };
 
   let displayName = props.caste.name || '';
@@ -26,7 +22,7 @@ function Tier(props) {
       <div className="col-12 mb-0">
         <div className="mb-0 d-flex flex-row justify-content-between tier__header" style={style}>
           <h3 className="mb-0 d-inline-block py-2 px-3 tier__label" >{displayName}</h3>
-          {props.canDelete ? createDeleteButton() : ''}
+          {props.onDelete ? (<button onClick={() => { props.onDelete(props.caste) }} className="d-inline-block py-2 px-3 btn tier__button" style={style}>X</button>) : ''}
         </div>
       </div>
       <div className="tier__collection col-12 d-flex flex-row flex-wrap justify-content-start tier__collection">
