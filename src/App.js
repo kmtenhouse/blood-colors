@@ -8,7 +8,7 @@ import offSpec from './data/off-spectrum';
 import castes from './data/hemospectrum-colors';
 import allColors from './data/all-colors';
 import canonTrolls from './data/canon-trolls';
-import { /* hexToRGB, */ hexToYUV } from './utils/hex-conversion';
+import { RGBtoYUV, hexToRGB, hexToYUV } from './utils/hex-conversion';
 import Form from './components/Form';
 
 class App extends React.Component {
@@ -28,6 +28,7 @@ class App extends React.Component {
       currCaste.caste = caste[1];
       currCaste.onSpec = true;
       currCaste.yuv = hexToYUV(caste[0]);
+      currCaste.rgb = hexToRGB(caste[0]);
       currCaste._id = this.createUUID();
       return currCaste;
     });
@@ -38,6 +39,7 @@ class App extends React.Component {
       currCaste.onSpec = false;
       currCaste.caste = caste[1];
       currCaste.yuv = hexToYUV(caste[0]);
+      currCaste.rgb = hexToRGB(caste[0]);
       currCaste._id = this.createUUID();
       return currCaste;
     });
@@ -50,12 +52,14 @@ class App extends React.Component {
       yWeight: 1,
       uWeight: 1,
       vWeight: 1,
+      rgbConstraint: 100,
+      yuvConstraint: 50,
       colors: [] //and no colors to distro just yet
     };
   }
 
   componentDidMount() {
-    const colorsToDistro = [].concat(canonTrolls, allColors).map(troll => this.createColorObject(troll));;
+    const colorsToDistro = [].concat(canonTrolls/* , allColors */).map(troll => this.createColorObject(troll));;
     const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
     this.setState({ colors: assignedColors });
   }
@@ -81,33 +85,49 @@ class App extends React.Component {
   }
 
   distributeColors(colorsToDistro, castes) {
+
     //takes an array of color objects, and an array of caste objects
     //go through the colors and get a fit / caste assignment for each
     colorsToDistro.forEach(color => {
-      //get the yuv of the current color
-      let currentColorYUV = hexToYUV(color.hex);
+      //get both the hex AND the yuv of the current color
+      let currColorRGB = hexToRGB(color.hex);
+
+      let currColorYUV = RGBtoYUV(currColorRGB);
+
       //next, analyze the fit against every caste
       //start by wiping out any old info
       color.fit = null;
-      color.caste = '';
+      color.caste = 'indeterminate'; //default
 
       //NOTE: use an old-school for loop because we might break it early
       for (let i = 0; i < castes.length; i++) {
-        let yDiff = Math.abs(currentColorYUV.y - castes[i].yuv.y) * this.state.yWeight;
-        let uDiff = Math.abs(currentColorYUV.u - castes[i].yuv.u) * this.state.uWeight;
-        let vDiff = Math.abs(currentColorYUV.v - castes[i].yuv.v) * this.state.vWeight;
-        let totalFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
+        //calculate the YUV diffs
+        let yDiff = Math.abs(currColorYUV.y - castes[i].yuv.y) * this.state.yWeight;
+        let uDiff = Math.abs(currColorYUV.u - castes[i].yuv.u) * this.state.uWeight;
+        let vDiff = Math.abs(currColorYUV.v - castes[i].yuv.v) * this.state.vWeight;
+        let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
+
+        //calculate the RGB diffs
+        let rDiff = Math.abs(currColorRGB.r - castes[i].rgb.r);
+        let gDiff = Math.abs(currColorRGB.g - castes[i].rgb.g);
+        let bDiff = Math.abs(currColorRGB.b - castes[i].rgb.b);
+        let totalRGBFit = Math.sqrt(Math.pow(rDiff, 2)+Math.pow(gDiff,2)+Math.pow(bDiff,2));
+
+        let totalFit = totalRGBFit;
+
         if (color.fit === null || totalFit < color.fit) {
-          color.caste = castes[i].name;
+          //check if it's within our rgb constraints
           color.fit = totalFit;
+          color.caste = castes[i].name;
         } else if (color.fit === totalFit) { //if we find any dupes, make this indeterminate!
           color.caste = 'indeterminate';
           color.fit = null;
           break;
         }
       }
-    });
 
+    });
+    console.log(colorsToDistro);
     return colorsToDistro;
   }
 
@@ -116,13 +136,13 @@ class App extends React.Component {
     let { name, value } = e.target;
     this.setState({ [name]: value });
   }
- 
+
   handleSubmit(event) {
     event.preventDefault();
     //recalculate colors with new weighting
     let tempColors = this.distributeColors(this.state.colors, this.state.castes);
-    this.setState({colors: tempColors});
-    
+    this.setState({ colors: tempColors });
+
   }
 
 
@@ -153,7 +173,10 @@ class App extends React.Component {
     return (
       <Container>
         <Title>Hemospectrum</Title>
-        <Form handleSubmit={this.handleSubmit} handleChange={this.handleChange} yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} />
+        <Form handleSubmit={this.handleSubmit} handleChange={this.handleChange}
+          yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight}
+          rWeight={this.state.rWeight} gWeight={this.state.gWeight} bWeight={this.state.bWeight}
+          rgbConstraint={this.state.rgbConstraint}  yuvConstraint={this.state.yuvConstraint} />
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)

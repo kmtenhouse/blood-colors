@@ -18,6 +18,14 @@ function Form(props) {
             V:
           <input type="text" name="vWeight" value={props.vWeight} onChange={props.handleChange} />
           </label>
+          <label>
+            RGB Constraint:
+          <input type="text" name="rgbConstraint" value={props.rgbConstraint} onChange={props.handleChange} />
+          </label>
+          <label>
+            YUV Constraint:
+          <input type="text" name="yuvConstraint" value={props.yuvConstraint} onChange={props.handleChange} />
+          </label>
           <input type="submit" value="Submit" />
         </form>
       </div>

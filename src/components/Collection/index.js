@@ -11,7 +11,7 @@ function Collection(props) {
     } 
 
     return( 
-        props.colors.map( (color, index) => <Colorbox size="thumbnail" key={index} name={color.name} hex={color.hex}></Colorbox> )
+        props.colors.map( (color, index) => <Colorbox size="thumbnail" key={index} color={color}></Colorbox> )
     );
 }
 
