@@ -61,7 +61,7 @@ class App extends React.Component {
     //(TO-DO):
     //long term these will come from the server
     const colorsToDistro = [].concat(canonTrolls, allColors).map(troll => this.createColorObject(troll));;
-    this.distributeColors(colorsToDistro, 100);
+    this.distributeColors(colorsToDistro, 75);
   }
 
   createColorObject(color) {
@@ -101,9 +101,9 @@ class App extends React.Component {
 
   }
 
-  distributeColors(colorsToDistro) {
+  distributeColors(colorsToDistro, constraint=100) {
     colorsToDistro.forEach(swatch => {
-      swatch.tier = this.getRGBFit(swatch);
+      swatch.tier = this.getRGBFit(swatch, constraint);
     });
     this.setState({ colors: colorsToDistro });
   }
