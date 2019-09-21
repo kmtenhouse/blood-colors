@@ -1,5 +1,4 @@
-.tier__label {
-    padding: 0.25em 0.25em 0.25em 0.5em;
-    margin-bottom: 0;
+.tier__header {
+    width:100%;
     max-width: 1100px;
-} 
+}
