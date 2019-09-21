@@ -49,17 +49,12 @@ class App extends React.Component {
 
     this.state = {
       castes: allCastes,
-      yWeight: 1,
-      uWeight: 1,
-      vWeight: 1,
-      rgbConstraint: 100,
-      yuvConstraint: 50,
       colors: [] //and no colors to distro just yet
     };
   }
 
   componentDidMount() {
-    const colorsToDistro = [].concat(canonTrolls/* , allColors */).map(troll => this.createColorObject(troll));;
+    const colorsToDistro = [].concat(canonTrolls , allColors).map(troll => this.createColorObject(troll));;
     const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
     this.setState({ colors: assignedColors });
   }
@@ -102,24 +97,27 @@ class App extends React.Component {
       //NOTE: use an old-school for loop because we might break it early
       for (let i = 0; i < castes.length; i++) {
         //calculate the YUV diffs
-        let yDiff = Math.abs(currColorYUV.y - castes[i].yuv.y) * this.state.yWeight;
-        let uDiff = Math.abs(currColorYUV.u - castes[i].yuv.u) * this.state.uWeight;
-        let vDiff = Math.abs(currColorYUV.v - castes[i].yuv.v) * this.state.vWeight;
+        let yDiff = Math.abs(currColorYUV.y - castes[i].yuv.y);
+        let uDiff = Math.abs(currColorYUV.u - castes[i].yuv.u);
+        let vDiff = Math.abs(currColorYUV.v - castes[i].yuv.v);
         let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
 
         //calculate the RGB diffs
         let rDiff = Math.abs(currColorRGB.r - castes[i].rgb.r);
         let gDiff = Math.abs(currColorRGB.g - castes[i].rgb.g);
         let bDiff = Math.abs(currColorRGB.b - castes[i].rgb.b);
-        let totalRGBFit = Math.sqrt(Math.pow(rDiff, 2)+Math.pow(gDiff,2)+Math.pow(bDiff,2));
+        let totalRGBFit = rDiff + gDiff + bDiff; //Math.sqrt(Math.pow(rDiff, 2)+Math.pow(gDiff,2)+Math.pow(bDiff,2));
 
-        let totalFit = totalRGBFit;
+        //let totalFit = totalRGBFit;
 
-        if (color.fit === null || totalFit < color.fit) {
+        if (color.fit === null || totalRGBFit < color.fit ) {
           //check if it's within our rgb constraints
-          color.fit = totalFit;
+          color.fit = totalRGBFit;
+          color.y = yDiff.toFixed(2);
+          color.u = uDiff.toFixed(2);
+          color.v = vDiff.toFixed(2);
           color.caste = castes[i].name;
-        } else if (color.fit === totalFit) { //if we find any dupes, make this indeterminate!
+        } else if (color.fit === totalRGBFit) { //if we find any dupes, make this indeterminate!
           color.caste = 'indeterminate';
           color.fit = null;
           break;
@@ -173,10 +171,6 @@ class App extends React.Component {
     return (
       <Container>
         <Title>Hemospectrum</Title>
-        <Form handleSubmit={this.handleSubmit} handleChange={this.handleChange}
-          yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight}
-          rWeight={this.state.rWeight} gWeight={this.state.gWeight} bWeight={this.state.bWeight}
-          rgbConstraint={this.state.rgbConstraint}  yuvConstraint={this.state.yuvConstraint} />
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)
