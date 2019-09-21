@@ -1,3 +1,8 @@
+export function hexToYUV(hex) {
+    let rgbObj = hexToRGB(hex);
+    return RGBtoYUV(rgbObj);
+}
+
 export function textContrast(hex) {
     let currentRGB = hexToRGB(hex);
     let luminResults = [currentRGB.r, currentRGB.g, currentRGB.b].map(bit => {
@@ -14,6 +19,13 @@ export function textContrast(hex) {
     return (luminosity > 0.179 ? "000000" : "FFFFFF");
 }
 
+export function RGBtoYUV(rgbObj) {
+    const { r, g, b} = rgbObj;
+    const y = r * .299000 + g *  .587000 + b * .114000;
+    const u = r * -.168736 + g * -.331264 + b * .500000 + 128;
+    const v = r * .500000 + g * -.418688 + b * -.081312 + 128;
+    return { y, u, v};
+}
 
 export function hexToRGB(hex) {
     if (hex.charAt(0) === "#") {
@@ -79,8 +91,7 @@ export function hexToHSL(hex) {
     return {
         h: h,
         s: s,
-        l: l,
-        hslString: `hsl(${h}, ${s}%, ${l}%)`
+        l: l
     };
 }
 

@@ -7,13 +7,8 @@
     overflow: hidden;
 }
 
-.colorbox--large {
-    height: 100px;
-    width: 100px;
-}
-
-.colorbox--thumbnail:hover {
-    transform: scale(2);
+.colorbox:hover {
+    transform: scale(1.75);
     transition: all 0.3s ease-in-out;
 }
 
