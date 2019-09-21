@@ -14,8 +14,10 @@ function Colorbox(props) {
   return (
     <div className={props.size === 'large' ? "colorbox colorbox--large" : "colorbox colorbox--thumbnail"} style={style}>
       <p className="colorbox__label">{(props.color.hasOwnProperty('name') ? props.color.name : '')}</p>
-      { <p className="colorbox__label">{(props.color.hasOwnProperty('fit') ? props.color.fit : '')}</p>}
-      <p className="colorbox__label">Y: { (props.color.hasOwnProperty('y') ? props.color.y : '')} U: {(props.color.hasOwnProperty('u') ? props.color.u : '')} V: {(props.color.hasOwnProperty('v') ? props.color.v : '')}</p> 
+      
+      { <p className="colorbox__label">{(props.color.hasOwnProperty('y') ? props.color.y.toFixed(2) : '')}</p>}
+      { <p className="colorbox__label">{(props.color.hasOwnProperty('u') ? props.color.u.toFixed(2) : '')}</p>}
+      { <p className="colorbox__label">{(props.color.hasOwnProperty('v') ? props.color.v.toFixed(2) : '')}</p>}
      
     </div>
   );

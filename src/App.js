@@ -54,7 +54,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const colorsToDistro = [].concat(canonTrolls , allColors).map(troll => this.createColorObject(troll));;
+    const colorsToDistro = [].concat(canonTrolls, allColors).map(troll => this.createColorObject(troll));;
     const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
     this.setState({ colors: assignedColors });
   }
@@ -106,17 +106,18 @@ class App extends React.Component {
         let rDiff = Math.abs(currColorRGB.r - castes[i].rgb.r);
         let gDiff = Math.abs(currColorRGB.g - castes[i].rgb.g);
         let bDiff = Math.abs(currColorRGB.b - castes[i].rgb.b);
-        let totalRGBFit = rDiff + gDiff + bDiff; //Math.sqrt(Math.pow(rDiff, 2)+Math.pow(gDiff,2)+Math.pow(bDiff,2));
-
-        //let totalFit = totalRGBFit;
-
-        if (color.fit === null || totalRGBFit < color.fit ) {
+        //let totalRGBFit = rDiff + gDiff + bDiff; 
+        let totalRGBFit = Math.sqrt(Math.pow(rDiff, 2)+Math.pow(gDiff,2)+Math.pow(bDiff,2));
+   
+        if (color.fit === null || totalRGBFit < color.fit) {
           //check if it's within our rgb constraints
-          color.fit = totalRGBFit;
-          color.y = yDiff.toFixed(2);
-          color.u = uDiff.toFixed(2);
-          color.v = vDiff.toFixed(2);
-          color.caste = castes[i].name;
+          if (totalRGBFit < 80 && vDiff < 10 && uDiff < 23.05) {
+            color.fit = totalRGBFit;
+            color.caste = castes[i].name;
+            color.y = yDiff; //currColorYUV.y;
+            color.u = uDiff; //currColorYUV.u;
+            color.v = vDiff; //currColorYUV.v;
+          }
         } else if (color.fit === totalRGBFit) { //if we find any dupes, make this indeterminate!
           color.caste = 'indeterminate';
           color.fit = null;
