@@ -74,12 +74,12 @@ class App extends React.Component {
   }
 
   //looks at our current tiers to determine where to distribute
-  getRGBFit(color, constraint=100) {
+  getFit(color, constraint=100) {
     let currentCastes = this.state.castes.filter(caste=>caste.name!=="indeterminate");
     let colorHex = hexToRGB(color.hex);
 
     let results = currentCastes.map(caste => {
-      let casteHex = hexToRGB(caste.hex);
+    let casteHex = hexToRGB(caste.hex);
 
       return {
         caste: caste.name,
@@ -105,9 +105,9 @@ class App extends React.Component {
 
   }
 
-  distributeColors(colorsToDistro, constraint=100) {
+  distributeColors(colorsToDistro) {
     colorsToDistro.forEach(swatch => {
-      let result = this.getRGBFit(swatch, constraint);
+      let result = this.getFit(swatch);
       swatch.fit = result.fit
       swatch.tier = result.caste;
     });
@@ -134,7 +134,7 @@ class App extends React.Component {
           this.state.castes
             .filter(caste => caste.onSpec === true)
             .map((caste, index) => (
-              <Tier caste={caste} onDelete={this.removeCaste} name={caste.tier} key={index} hex={caste.hex}>
+              <Tier caste={caste} onDelete={this.removeCaste} key={caste._id}>
                 <Collection tier={caste.tier} colors={this.state.colors} />
               </Tier>
             ))
@@ -144,7 +144,7 @@ class App extends React.Component {
           this.state.castes
             .filter(caste => caste.onSpec === false)
             .map((caste, index) => (
-              <Tier caste={caste} onDelete={this.removeCaste} name={caste.tier} key={index} hex={caste.hex} canDelete={(caste.name==='indeterminate' ? false : true)}>
+              <Tier caste={caste} onDelete={this.removeCaste} key={caste._id} canDelete={(caste.name==='indeterminate' ? false : true)}>
                 <Collection tier={caste.tier} colors={this.state.colors} />
               </Tier>
             ))

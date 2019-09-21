@@ -9,14 +9,14 @@ function DeleteButton() {
 }
 
 function Tier(props) {
-  const contrastColor = "#" + textContrast(props.hex);
+  const contrastColor = "#" + textContrast(props.caste.hex);
 
   const style = {
-    backgroundColor: "#" + props.hex || "FFFFFF",
+    backgroundColor: "#" + props.caste.hex || "FFFFFF",
     color: contrastColor || "FFFFFF",
   };
 
-  let displayName = props.name || '';
+  let displayName = props.caste.name || '';
   if (displayName.length > 0) {
     displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1).toLowerCase();
   }
