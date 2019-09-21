@@ -1,13 +1,10 @@
 const offSpec = [
-    ["FF0000","Karkat"],
-    ["000000","black"],
-    ["FFFFFF","white"], 
-
-/*     ["A69279", "Donkey Brown"],
-    ["773F1A","walnut"],
-    ["292319","Zeus"],
-    ["646A54", "Siam"],
-    ["00FF00", "Green"] */
+    ["FF0000", "Karkat"],
+    ["000000", "black"],
+    ["FFFFFF", "white"],
+/*     ["773F1A", "walnut"],
+    ["A69279", "Donkey Brown"],
+    ["3F3002", "This"] */
 ];
 
 export default offSpec;

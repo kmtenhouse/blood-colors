@@ -111,7 +111,7 @@ class App extends React.Component {
         let totalFit = totalRGBFit + totalYUVFit;
 
         if (color.fit === null || totalFit < color.fit) {
-          if (totalFit < 90 && totalRGBFit < 100) {
+          if (totalFit < 90 && totalRGBFit < 70) {
             //check if it's within our rgb constraints
             color.fit = totalFit;
             color.caste = castes[i].name;
