@@ -5,7 +5,9 @@ function Form(props) {
   return (
     <form>
       <label>
-        Name:
+        <select>
+          {props.castes.map(caste => <option>{caste.name}</option>)}
+        </select>
       <input type="text" name="name" />
       </label>
       <input type="submit" value="Submit" />

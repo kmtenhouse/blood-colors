@@ -97,17 +97,19 @@ class App extends React.Component {
     this.setState({ [name]: value });
   }
 
+  removeCaste(param) {
+    console.log(param);
+  }
+
   render() {
     return (
       <Container>
-        <Form />
-
         <h2>Hemospectrum</h2>
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)
             .map((caste, index) => (
-              <Tier name={caste.tier} key={index} hex={caste.hex}>
+              <Tier onDelete={this.removeCaste} name={caste.tier} key={index} hex={caste.hex}>
                 <Collection tier={caste.tier} colors={this.state.colors} />
               </Tier>
             ))
@@ -117,7 +119,7 @@ class App extends React.Component {
           this.state.castes
             .filter(caste => caste.onSpec === false)
             .map((caste, index) => (
-              <Tier name={caste.tier} key={index} hex={caste.hex}>
+              <Tier onDelete={this.removeCaste} name={caste.tier} key={index} hex={caste.hex}>
                 <Collection tier={caste.tier} colors={this.state.colors} />
               </Tier>
             ))
