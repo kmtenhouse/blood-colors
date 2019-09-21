@@ -22,7 +22,7 @@ class App extends React.Component {
     //first, go through all approved colors and make sure they're on spec...
     let onSpecCaste = castes.map(caste => {
       let currCaste = this.createColorObject(caste);
-      currCaste.tier = caste[1];
+      currCaste.caste = caste[1];
       currCaste.onSpec = true;
       currCaste._id = id;
       id++;
@@ -32,7 +32,7 @@ class App extends React.Component {
     //...then do the opposite with offspec
     let offSpecCaste = offSpec.map(caste => {
       let currCaste = this.createColorObject(caste);
-      currCaste.tier = caste[1];
+      currCaste.caste = caste[1];
       currCaste.onSpec = false;
       currCaste._id = id;
       id++;
@@ -42,6 +42,7 @@ class App extends React.Component {
     //lastly, add an indeterminate catch-all
     const indeterminateCaste = {
       hex: "000000",
+      caste: "indeterminate",
       name: "indeterminate",
       tier: "indeterminate", 
       onSpec: false,
@@ -60,7 +61,7 @@ class App extends React.Component {
   componentDidMount() {
     //(TO-DO):
     //long term these will come from the server
-    const colorsToDistro = [].concat(canonTrolls, allColors).map(troll => this.createColorObject(troll));;
+    const colorsToDistro = [].concat(canonTrolls , allColors).map(troll => this.createColorObject(troll));;
     this.distributeColors(colorsToDistro, 75);
   }
 
@@ -68,7 +69,7 @@ class App extends React.Component {
     let newObj = {
       hex: color[0],
       name: color[1],
-      tier: ''
+      caste: ''
     };
     return newObj;
   }
@@ -109,7 +110,7 @@ class App extends React.Component {
     colorsToDistro.forEach(swatch => {
       let result = this.getFit(swatch);
       swatch.fit = result.fit
-      swatch.tier = result.caste;
+      swatch.caste = result.caste;
     });
     this.setState({ colors: colorsToDistro });
   }
@@ -135,7 +136,7 @@ class App extends React.Component {
             .filter(caste => caste.onSpec === true)
             .map(caste => (
               <Tier caste={caste} key={caste._id}>
-                <Collection tier={caste.tier} colors={this.state.colors} />
+                <Collection caste={caste} colors={this.state.colors} />
               </Tier>
             ))
         }
@@ -145,7 +146,7 @@ class App extends React.Component {
             .filter(caste => caste.onSpec === false)
             .map(caste => (
               <Tier caste={caste} onDelete={this.removeCaste} key={caste._id} canDelete={(caste.name==='indeterminate' ? false : true)}>
-                <Collection tier={caste.tier} colors={this.state.colors} />
+                <Collection caste={caste} colors={this.state.colors} />
               </Tier>
             ))
         }
