@@ -8,15 +8,17 @@ import offSpec from './data/off-spectrum';
 import castes from './data/hemospectrum-colors';
 import allColors from './data/all-colors';
 import canonTrolls from './data/canon-trolls';
-import { hexToRGB } from './utils/hex-conversion';
-
-
+import { /* hexToRGB, */ hexToYUV } from './utils/hex-conversion';
+import Form from './components/Form';
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
+    //bindings!
     this.removeCaste = this.removeCaste.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
     //(TO-DO): make this an actual database so we have real ids askdlj
 
     //castes are (currently) defined as a color object with a caste name and a boolean, on-spec or off-spec
@@ -25,6 +27,7 @@ class App extends React.Component {
       let currCaste = this.createColorObject(caste);
       currCaste.caste = caste[1];
       currCaste.onSpec = true;
+      currCaste.yuv = hexToYUV(caste[0]);
       currCaste._id = this.createUUID();
       return currCaste;
     });
@@ -32,8 +35,9 @@ class App extends React.Component {
     //...then do the opposite with offspec
     let offSpecCaste = offSpec.map(caste => {
       let currCaste = this.createColorObject(caste);
-      currCaste.caste = caste[1];
       currCaste.onSpec = false;
+      currCaste.caste = caste[1];
+      currCaste.yuv = hexToYUV(caste[0]);
       currCaste._id = this.createUUID();
       return currCaste;
     });
@@ -43,6 +47,9 @@ class App extends React.Component {
 
     this.state = {
       castes: allCastes,
+      yWeight: 1,
+      uWeight: 1,
+      vWeight: 1,
       colors: [] //and no colors to distro just yet
     };
   }
@@ -73,57 +80,51 @@ class App extends React.Component {
     return newObj;
   }
 
-  //looks at our current tiers to determine where to distribute
-  getFit(color, castes) {
-    let currentCastes = castes.filter(caste => caste.name !== "indeterminate");
-    let colorHex = hexToRGB(color.hex);
-
-    let results = currentCastes.map(caste => {
-      let casteHex = hexToRGB(caste.hex);
-
-      return {
-        caste: caste.name,
-        fit: Math.abs(casteHex.r - colorHex.r) + Math.abs(casteHex.g - colorHex.g) + Math.abs(casteHex.b - colorHex.b)
-      };
-    });
-
-    results = results.sort((a, b) => (a.fit > b.fit ? 1 : -1));
-
-    //check for any dupes -- if we have two that are identical, go ahead and chuck into 'indeterminate'
-    let bestMatch = results[0];
-    let totalMatches = results.filter(result => result.fit === bestMatch.fit).length;
-
-    const constraint = 100;
-    //otherwise, let's impose some arbitrary constraints (based on what we put in)
-    if (totalMatches > 1 || bestMatch.fit > constraint) {
-      return {
-        caste: 'indeterminate',
-        fit: 0
-      };
-    } else {
-      return bestMatch;
-    }
-
-  }
-
   distributeColors(colorsToDistro, castes) {
     //takes an array of color objects, and an array of caste objects
     //go through the colors and get a fit / caste assignment for each
+    colorsToDistro.forEach(color => {
+      //get the yuv of the current color
+      let currentColorYUV = hexToYUV(color.hex);
+      //next, analyze the fit against every caste
+      //start by wiping out any old info
+      color.fit = null;
+      color.caste = '';
 
-
-    colorsToDistro.forEach(swatch => {
-      let result = this.getFit(swatch, castes);
-      swatch.fit = result.fit
-      swatch.caste = result.caste;
+      //NOTE: use an old-school for loop because we might break it early
+      for (let i = 0; i < castes.length; i++) {
+        let yDiff = Math.abs(currentColorYUV.y - castes[i].yuv.y) * this.state.yWeight;
+        let uDiff = Math.abs(currentColorYUV.u - castes[i].yuv.u) * this.state.uWeight;
+        let vDiff = Math.abs(currentColorYUV.v - castes[i].yuv.v) * this.state.vWeight;
+        let totalFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
+        if (color.fit === null || totalFit < color.fit) {
+          color.caste = castes[i].name;
+          color.fit = totalFit;
+        } else if (color.fit === totalFit) { //if we find any dupes, make this indeterminate!
+          color.caste = 'indeterminate';
+          color.fit = null;
+          break;
+        }
+      }
     });
+
     return colorsToDistro;
   }
 
- /*  handleChange(e) {
+  handleChange(e) {
     e.preventDefault();
     let { name, value } = e.target;
     this.setState({ [name]: value });
-  } */
+  }
+ 
+  handleSubmit(event) {
+    event.preventDefault();
+    //recalculate colors with new weighting
+    let tempColors = this.distributeColors(this.state.colors, this.state.castes);
+    this.setState({colors: tempColors});
+    
+  }
+
 
   removeCaste(casteToDelete) {
     //first, remove the caste from the array
@@ -152,12 +153,13 @@ class App extends React.Component {
     return (
       <Container>
         <Title>Hemospectrum</Title>
+        <Form handleSubmit={this.handleSubmit} handleChange={this.handleChange} yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} />
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)
             .map(caste => (
               <Tier caste={caste} key={caste._id}>
-                <Collection caste={caste} colors={this.state.colors.filter( color=>color.caste===caste.name)} />
+                <Collection caste={caste} colors={this.state.colors.filter(color => color.caste === caste.name)} />
               </Tier>
             ))
         }
@@ -167,13 +169,13 @@ class App extends React.Component {
             .filter(caste => caste.onSpec === false)
             .map(caste => (
               <Tier caste={caste} onDelete={this.removeCaste} key={caste._id}>
-                <Collection caste={caste} colors={this.state.colors.filter( color=>color.caste===caste.name)} />
+                <Collection caste={caste} colors={this.state.colors.filter(color => color.caste === caste.name)} />
               </Tier>
             ))
         }
         <Title>Could Not Determine Automagically</Title>
-        <Tier caste={{ name: 'indeterminate', caste: 'indeterminate'}}>
-          <Collection caste={{ name: 'indeterminate', caste: 'indeterminate'}} colors={this.state.colors.filter(color=>color.caste==='indeterminate')} />
+        <Tier caste={{ name: 'indeterminate', caste: 'indeterminate' }}>
+          <Collection caste={{ name: 'indeterminate', caste: 'indeterminate' }} colors={this.state.colors.filter(color => color.caste === 'indeterminate')} />
         </Tier>
       </Container>
     );
