@@ -133,8 +133,8 @@ class App extends React.Component {
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)
-            .map((caste, index) => (
-              <Tier caste={caste} onDelete={this.removeCaste} key={caste._id}>
+            .map(caste => (
+              <Tier caste={caste} key={caste._id}>
                 <Collection tier={caste.tier} colors={this.state.colors} />
               </Tier>
             ))
@@ -143,7 +143,7 @@ class App extends React.Component {
         {
           this.state.castes
             .filter(caste => caste.onSpec === false)
-            .map((caste, index) => (
+            .map(caste => (
               <Tier caste={caste} onDelete={this.removeCaste} key={caste._id} canDelete={(caste.name==='indeterminate' ? false : true)}>
                 <Collection tier={caste.tier} colors={this.state.colors} />
               </Tier>
