@@ -8,6 +8,7 @@ import offSpec from './data/off-spectrum';
 import castes from './data/hemospectrum-colors';
 import allColors from './data/all-colors';
 import canonTrolls from './data/canon-trolls';
+import veTrolls from './data/vast-error';
 import { RGBtoYUV, hexToRGB, hexToYUV } from './utils/hex-conversion';
 import Form from './components/Form';
 
@@ -54,7 +55,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const colorsToDistro = [].concat(canonTrolls, allColors).map(troll => this.createColorObject(troll));;
+    const colorsToDistro = [].concat(canonTrolls, veTrolls, allColors).map(troll => this.createColorObject(troll));;
     const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
     this.setState({ colors: assignedColors });
   }
