@@ -83,27 +83,33 @@ class App extends React.Component {
 
       return {
         caste: caste.name,
-        totalDistance: Math.abs(casteHex.r - colorHex.r) + Math.abs(casteHex.g - colorHex.g) + Math.abs(casteHex.b - colorHex.b)
+        fit: Math.abs(casteHex.r - colorHex.r) + Math.abs(casteHex.g - colorHex.g) + Math.abs(casteHex.b - colorHex.b)
       };
     });
 
-    results = results.sort((a, b) => (a.totalDistance > b.totalDistance ? 1 : -1));
+    results = results.sort((a, b) => (a.fit > b.fit ? 1 : -1));
 
     //check for any dupes -- if we have two that are identical, go ahead and chuck into 'indeterminate'
     let bestMatch = results[0];
-    let totalMatches = results.filter(result => result.totalDistance === bestMatch.totalDistance).length;
-    if(totalMatches > 1) {
-      return 'indeterminate';
-    }
-
+    let totalMatches = results.filter(result => result.fit === bestMatch.fit).length;
+    
     //otherwise, let's impose some arbitrary constraints (based on what we put in)
-    return (bestMatch.totalDistance < constraint ? bestMatch.caste : 'indeterminate');
+    if(totalMatches > 1 || bestMatch.fit > constraint) {
+      return {
+        caste: 'indeterminate', 
+        fit: 0
+      };
+    } else {
+      return bestMatch;
+    }
 
   }
 
   distributeColors(colorsToDistro, constraint=100) {
     colorsToDistro.forEach(swatch => {
-      swatch.tier = this.getRGBFit(swatch, constraint);
+      let result = this.getRGBFit(swatch, constraint);
+      swatch.fit = result.fit
+      swatch.tier = result.caste;
     });
     this.setState({ colors: colorsToDistro });
   }

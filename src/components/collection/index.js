@@ -9,10 +9,12 @@ function Collection(props) {
             </div>
         );
     } 
-    //otherwise, loop through and make lots of tiny colorboxes :)
-    //NOTE: someday we'll need to pass in a color id too
+
+    let colorsToShow = props.colors
+        .filter(color => color.tier===props.tier);
+    
     return( 
-        props.colors.map( (color, index) => (props.tier===color.tier ? <Colorbox size="thumbnail" key={index} name={color.name} hex={color.hex}></Colorbox> : '') )
+        colorsToShow.map( (color, index) => <Colorbox size="thumbnail" key={index} name={color.name} hex={color.hex}></Colorbox> )
     );
 }
 

@@ -11,8 +11,6 @@ function DeleteButton() {
 function Tier(props) {
   const contrastColor = "#" + textContrast(props.hex);
 
-  console.log(props);
-
   const style = {
     backgroundColor: "#" + props.hex || "FFFFFF",
     color: contrastColor || "FFFFFF",
