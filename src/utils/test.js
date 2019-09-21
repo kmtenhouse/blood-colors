@@ -37,9 +37,8 @@ const canonTrolls = [
   ["F70000", "Signless"]
 ];
 
-const group =  [["228B22", ""],   ["336601",  "Nepeta"],
-["517600",  "Meulin"],
-["416600",  "The Disciple"]];
+const group =  [["523C94", ""],   ["440a7f",  "Gamzee"],
+["6600da",  "Kurloz"],];
 
 let result = averageColor(group.map(pair => pair[0]));
 

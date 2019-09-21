@@ -80,47 +80,54 @@ class App extends React.Component {
     return newObj;
   }
 
-  distributeColors(colorsToDistro, castes) {
+  getRGBDistance(color, target) { //assumes both are objects with r, g, b keys
+/*     let rDiff = target.r - color.r;
+    let gDiff = target.g - color.g;
+    let bDiff = target.b - color.b;
+    let totalRGBFit = Math.sqrt(Math.pow(rDiff, 2) + Math.pow(gDiff, 2) + Math.pow(bDiff, 2));
+    return totalRGBFit; */
+    let rMean = ( target.r + color.r ) / 2;
+    let r = target.r - color.r;
+    let g = target.g - color.g;
+    let b = target.b - color.b;
+    return Math.sqrt((((512+rMean)*r*r)>>8) + 4*g*g + (((767-rMean)*b*b)>>8));
+  }
 
+  getYUVDistance(color, target) {
+    let yDiff = (target.y - color.y)*1;
+    let uDiff = (target.u - color.u)*0.25;
+    let vDiff = (target.v - color.v)*0.25;
+    let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
+    return totalYUVFit;
+  }
+
+  distributeColors(colorsToDistro, castes) {
     //takes an array of color objects, and an array of caste objects
     //go through the colors and get a fit / caste assignment for each
     colorsToDistro.forEach(color => {
       //get both the hex AND the yuv of the current color
       let currColorRGB = hexToRGB(color.hex);
-
       let currColorYUV = RGBtoYUV(currColorRGB);
 
-      //next, analyze the fit against every caste
-      //start by wiping out any old info
+      //next, wipe out old info
       color.fit = null;
       color.caste = 'indeterminate'; //default
 
       //NOTE: use an old-school for loop because we might break it early
       for (let i = 0; i < castes.length; i++) {
         //calculate the YUV diffs
-        let yDiff = (castes[i].yuv.y - currColorYUV.y)*1;
-        let uDiff = (castes[i].yuv.u - currColorYUV.u)*0.25;
-        let vDiff = (castes[i].yuv.v - currColorYUV.v)*0.25;
-        let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
+        let totalYUVFit = this.getYUVDistance(castes[i].yuv, currColorYUV);
 
         //calculate the RGB diffs
-        let rDiff = castes[i].rgb.r - currColorRGB.r;
-        let gDiff = castes[i].rgb.g - currColorRGB.g;
-        let bDiff = castes[i].rgb.b - currColorRGB.b;
-        let totalRGBFit = Math.sqrt(Math.pow(rDiff, 2) + Math.pow(gDiff, 2) + Math.pow(bDiff, 2));
+        let totalRGBFit = this.getRGBDistance(castes[i].rgb, currColorRGB);
 
         let totalFit = totalRGBFit + totalYUVFit;
 
         if (color.fit === null || totalFit < color.fit) {
-          if (totalFit < 90 && totalRGBFit < 70) {
+          if (totalFit < 170 && totalRGBFit < 120) {
             //check if it's within our rgb constraints
             color.fit = totalFit;
             color.caste = castes[i].name;
-            color.y = yDiff;
-            color.u = uDiff;
-            color.v = vDiff;
-            color.rgbDiff = totalRGBFit;
-            color.yuvDiff = totalYUVFit;
           }
         } else if (color.fit === totalFit) { //if we find any dupes, make this indeterminate!
           color.caste = 'indeterminate';
