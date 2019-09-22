@@ -10,6 +10,7 @@
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:prod": "node server.js",
     "start:dev": "concurrently \"nodemon --ignore 'client/*'\" \"npm run client\"",
+    "seed": "node database/seeds/index.js",
     "client": "cd client && npm run start",
     "install": "cd client && npm install",
     "build": "cd client && npm run build",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "mongoose-seed": "^0.6.0",
-    "nodemon": "^1.19.2"
+    "nodemon": "^1.19.2",
+    "require-all": "^3.0.0"
   }
 }

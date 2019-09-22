@@ -1,38 +1,44 @@
-var seeder = require('mongoose-seed');
+
+// Require the mongoose seeder package
+const seeder = require('mongoose-seed');
+
+// Data array containing seed data -- this will include anything within the json directory
+const allSeeds = require("./data");
 
 // Connect to MongoDB via Mongoose
-seeder.connect('mongodb://localhost/sample-dev', function () {
-
-  // Load Mongoose models
-  seeder.loadModels([
-    'app/model1File.js',
-    'app/model2File.js'
-  ]);
-
-  // Clear specified collections
-  seeder.clearModels(['Model1', 'Model2'], function () {
-
-    // Callback to populate DB once collections have been cleared
-    seeder.populateModels(data, function () {
-      seeder.disconnect();
-    });
-
-  });
-});
-
-// Data array containing seed data - documents organized by Model
-var data = [
+seeder.connect('mongodb://localhost/bloodcolorsdev',
   {
-    'model': 'Model1',
-    'documents': [
-      {
-        'name': 'Doc1',
-        'value': 200
-      },
-      {
-        'name': 'Doc2',
-        'value': 400
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  },
+  function () {
+
+    try {
+      // Load all available Mongoose models
+      seeder.loadModels([
+        'database/schema/'
+      ]);
+
+      //figure out which collections we are clearing
+      const modelsToClear = [];
+      for (seed of allSeeds) {
+        modelsToClear.push(seed.model);
       }
-    ]
-  }
-]; 
+
+      // Clear specified collections
+      seeder.clearModels(modelsToClear, function () {
+
+        // Callback to populate DB once collections have been cleared
+        seeder.populateModels(allSeeds, function () {
+          seeder.disconnect();
+        });
+
+      });
+    }
+    catch(err) {
+      console.log(err);
+      seeder.disconnect();
+    }
+  
+  });
+

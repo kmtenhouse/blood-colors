@@ -1,0 +1,15 @@
+{
+    "model": "Color",
+    "documents": [
+        {
+            "name": "Black",
+            "hex": "#000000",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "White",
+            "hex": "#FFFFFF",
+            "contrastColor": "#000000"
+        }
+    ]
+}
