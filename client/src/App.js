@@ -29,33 +29,36 @@ class App extends React.Component {
     this.handleColorsReset = this.handleColorsReset.bind(this);
 
     //next, go through all approved colors and make sure they're marked as on spec...
-    //(TO-DO) fix this
     onSpecCastes.forEach(caste => caste.onSpec = true);
 
     //then set the initial state
     this.state = {
+      definitions: onSpecCastes, //default caste definitions are what is on spec
       castes: onSpecCastes,
       colors: [], //no colors to distro just yet
       yWeight: 1,
       uWeight: 0.25,
-      vWeight: 0.25
+      vWeight: 0.25,
+      fitConstraint: 100
     };
   }
 
   componentDidMount() {
     //Make sure the canon trolls define their castes to start out...
     canonTrolls.forEach(troll => troll.definesCaste = true);
-    //...then distribute everything else accordingly :)
 
-    let colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
+    //...then distribute everything else accordingly :)
     this.setState({
-      yWeight: 1,
-      uWeight: 0.25,
-      vWeight: 0.25
+      definitions: [].concat(this.state.definitions, canonTrolls)
     });
 
+    //next, distribute our colors based on these constraints
+    let colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
     colorsToDistro = this.distributeColors(colorsToDistro);
-    this.setState({ colors: colorsToDistro });
+
+    this.setState({
+      colors: colorsToDistro,
+    });
   }
 
   /*   Form Handling */
@@ -91,6 +94,11 @@ class App extends React.Component {
         //we also want to recalculate the caste in case we just unlocked it - maybe it should shuffle elsewhere
         if (tempColors[i].definesCaste === false) {
           tempColors[i].caste = this.determineCasteForOneColor(tempColors[i]);
+        } else {
+          //otherwise add it to our definitions!
+          let newDef = this.state.definitions;
+          newDef.push(tempColors[i]);
+          this.setState({ definitions: newDef });
         }
         break;
       }
@@ -130,37 +138,40 @@ class App extends React.Component {
 
   determineCasteForOneColor(color) {
     //takes in a single color and calculates its current caste
-    //grab our current caste definitions
-    //TO-DO: REFACTOR
-    const castes = this.state.castes;
+    //returns the caste it belongs to (default: 'indeterminate')
 
-    //We also prepare to look for which color is the current best fit
+    //first, we make an object to hold our counts
+    const casteFit = {};
+    this.state.castes.forEach(caste => {
+      casteFit[caste.name] = {
+        sum: 0,
+        count: 0
+      };
+    });
+
+    //now we calculate the average fit based on key colors
+    this.state.definitions.forEach(def => {
+      if (casteFit[def.name]) {
+        casteFit[def.name].sum += this.getRGBDistance(color.RGB, def.RGB);
+        casteFit[def.name].count++;
+      }
+    });
+
+    //lastly, figure out the averages for each one and return the result
+    let bestCaste = "indeterminate";
     let bestFit = null;
-    let newCaste = 'indeterminate';
+    for (let caste in casteFit) {
+      let avgFit = casteFit[caste].sum / casteFit[caste].count;
 
-    //NOTE: use an old-school for loop because we might break it early
-    for (let i = 0; i < castes.length; i++) {
-      //calculate the YUV diffs
-      let totalYUVFit = this.getYUVDistance(castes[i].YUV, color.YUV);
-
-      //calculate the RGB diffs
-      let totalRGBFit = this.getRGBDistance(castes[i].RGB, color.RGB);
-
-      let totalFit = totalRGBFit + totalYUVFit;
-
-      if (bestFit === null || totalFit < bestFit) {
-        if (totalFit < 170 && totalRGBFit < 120) {
-          //check if it's within our rgb constraints
-          bestFit = totalFit;
-          newCaste = castes[i].name; //TO-DO: Refactor to use IDs instead 
+      if (bestFit === null || (avgFit < bestFit)) {
+        if (avgFit < this.state.fitConstraint) {
+          bestFit = avgFit;
+          color.fit = bestFit;
+          bestCaste = caste;
         }
-      } else if (bestFit === totalFit) { //if we find any dupes, make this indeterminate!
-        newCaste = 'indeterminate';
-        break;
       }
     }
-
-    return newCaste;
+    return bestCaste;
   }
 
   distributeColors(arr) {
@@ -169,7 +180,7 @@ class App extends React.Component {
     const colorsToDistro = arr.slice(0);
     colorsToDistro.forEach(color => {
       //Note: we don't determine the weight for something that is 'locked'
-      if (!color.definesCaste || (color.definesCaste && color.caste === '')) {
+      if (!color.definesCaste) {
         color.caste = this.determineCasteForOneColor(color);
       }
     });
