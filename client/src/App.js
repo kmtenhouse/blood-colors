@@ -5,7 +5,6 @@ import './App.css';
 /* Import components */
 import Tier from './components/Tier';
 import Container from './components/Container';
-import Collection from './components/Collection';
 import Title from './components/Title';
 import Form from './components/Form';
 
@@ -151,7 +150,7 @@ class App extends React.Component {
     return (
       <Container>
         <Title>Hemospectrum</Title>
-        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
+        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} handleChange={this.handleChange} handleSubmit={this.handleSubmit} /> 
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)
@@ -161,7 +160,7 @@ class App extends React.Component {
             ))
         }
         <Title>Off Spectrum</Title>
-        <Tier caste={{ name: '', caste: 'indeterminate' }} colors={this.state.colors.filter(color => color.caste === 'indeterminate')}>
+        <Tier handleLockToggle={this.handleLockToggle} caste={{ name: '', caste: 'indeterminate' }} colors={this.state.colors.filter(color => color.caste === 'indeterminate')}>
         </Tier>
       </Container>
     );

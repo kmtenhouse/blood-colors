@@ -22,7 +22,7 @@ function Form(props) {
             <div className="input-group-prepend">
               <div className="input-group-text">U</div>
             </div>
-            <input type="number" min="0" step="0.05"  className="form-control" id="uWeight" name="uWeight" value={props.uWeight} onChange={props.handleChange} />
+            <input type="number" min="0" step="0.05" className="form-control" id="uWeight" name="uWeight" value={props.uWeight} onChange={props.handleChange} />
           </div>
         </div>
 

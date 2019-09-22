@@ -19,7 +19,7 @@ function Tier(props) {
   }
 
   return (
-    <div className="container-fluid tier">
+    <div className="container-fluid tier my-4">
       <div className="row">
         <div className="col-12 mb-0 px-0">
           <div className="mb-0 d-flex flex-row justify-content-between tier__header" style={style}>
