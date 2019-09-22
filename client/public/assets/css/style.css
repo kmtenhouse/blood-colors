@@ -1,16 +1,6 @@
 body {
-    background-image: url("../images/what-the-hex-dark.png");
+    background-image: url("/assets/img/what-the-hex-dark.png");
     background-repeat: repeat;  
     background-color: white;
-    color: white;
-}
-
-/* spectrum contains all the defined on and off spectrum groups */
-.spectrum {
-    margin: 0 auto;
-    max-width: 300px;
-}
-
-.spectrum__title {
     color: white;
 }
