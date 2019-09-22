@@ -23,7 +23,7 @@ class App extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleLockToggle = this.handleLockToggle.bind(this);
     this.handleColorsReset = this.handleColorsReset.bind(this);
-
+    this.handleDropDown = this.handleDropDown.bind(this);
     //next, go through all approved colors and make sure they're marked as on spec...
     onSpecCastes.forEach(caste => caste.onSpec = true);
 
@@ -49,7 +49,7 @@ class App extends React.Component {
     });
 
     //next, distribute our colors based on these constraints
-    let colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
+    let colorsToDistro = [].concat(canonTrolls , veTrolls, allColors);
     colorsToDistro = this.distributeColors(colorsToDistro);
 
     this.setState({
@@ -62,6 +62,23 @@ class App extends React.Component {
     e.preventDefault();
     let { name, value } = e.target;
     this.setState({ [name]: value });
+  }
+
+  handleDropDown(event, colorToEdit) {
+    event.preventDefault();
+    let chosenCaste = event.target.value;
+    //forcibly update this item to be part of another caste (and lock it there to be sure)
+    let tempColors = this.state.colors;
+    //Note: we're using a vanilla for loop so we can break as soon as we find the relevant one
+    for (let i = 0; i < tempColors.length; i++) {
+      if(tempColors[i]._id===colorToEdit._id) {
+        console.log(chosenCaste.name);
+        tempColors[i].caste = chosenCaste;
+        tempColors[i].definesCaste = true;
+        break;
+      }
+    }
+    this.setState({ colors: this.distributeColors(tempColors) });
   }
 
   handleSubmit(event) {
@@ -122,14 +139,6 @@ class App extends React.Component {
     let g = target.g - color.g;
     let b = target.b - color.b;
     return Math.sqrt((((512 + rMean) * r * r) >> 8) + 4 * g * g + (((767 - rMean) * b * b) >> 8));
-  }
-
-  getYUVDistance(color, target) {
-    let yDiff = (target.y - color.y) * this.state.yWeight;
-    let uDiff = (target.u - color.u) * this.state.uWeight;
-    let vDiff = (target.v - color.v) * this.state.vWeight;
-    let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
-    return totalYUVFit;
   }
 
   determineCasteForOneColor(color) {
@@ -195,8 +204,10 @@ class App extends React.Component {
             .map(caste => (
               <Tier
                 handleLockToggle={this.handleLockToggle}
+                handleDropDown={this.handleDropDown}
                 caste={caste} key={caste._id}
-                colors={this.state.colors.filter(color => color.caste === caste.name).sort((a, b) => ( (!b.hasOwnProperty('fit') || a.fit > b.fit) ? 1 : -1)) }>
+                castes={this.state.castes}
+                colors={this.state.colors.filter(color => color.caste === caste.name).sort((a, b) => ((!b.hasOwnProperty('fit') || a.fit > b.fit) ? 1 : -1))}>
               </Tier>
             ))
         }

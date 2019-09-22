@@ -30,7 +30,7 @@ function Tier(props) {
       </div>
       <div className="row">
         <div className="col-12 d-flex flex-row flex-wrap justify-content-start px-0 tier__collection">
-          <Collection handleLockToggle={props.handleLockToggle} caste={props.caste} colors={props.colors} />
+          <Collection castes={props.castes} handleDropDown={props.handleDropDown} handleLockToggle={props.handleLockToggle} caste={props.caste} colors={props.colors} />
         </div>
       </div>
     </div>
