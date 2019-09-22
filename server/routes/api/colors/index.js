@@ -7,6 +7,7 @@ const colorsController = require("../../../controllers/color-controller");
 //healthcheck route
 router.get("/", colorsController.findAll);
 router.post("/", colorsController.create);
+router.get("/:id", colorsController.findOneById)
 router.delete("/:id", colorsController.delete);
 
 module.exports = router;

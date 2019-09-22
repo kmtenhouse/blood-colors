@@ -8,6 +8,10 @@ module.exports = {
         return Color.find({});
     },
 
+    findOneById: function(colorId) {
+        return Color.findById({_id: colorId});
+    },
+
     createOne: function (colorObj) {
         console.log(colorObj);
         return new Promise((resolve, reject) => {
