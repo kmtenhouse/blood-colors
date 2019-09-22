@@ -2,9 +2,14 @@
 
 const router = require("express").Router();
 
-// If no API routes are hit, send the React app
-router.use((req, res) =>
-  res.sendFile(path.join(__dirname, "../client/build/index.html"))
-);
+const apiRoutes = require("./api");
+
+//MAIN ROUTES
+//healthcheck route
+router.get("/", (req, res) => {
+  res.send("Slash route");
+});
+
+router.use("/api", apiRoutes);
 
 module.exports = router;

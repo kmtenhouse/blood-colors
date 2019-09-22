@@ -2,12 +2,13 @@ const Color = require("../services/color-service");
 
 module.exports = {
     findAll: function (req, res) {
-        Color.findAllColors()
+        Color.findAll()
             .then(results => res.json(results))
             .catch(err => res.status(500).json({ error: err.message }));
     },
     create: function (req, res) {
-        Color.createOne({ text: req.body.text })
+        
+        Color.createOne({ name: req.body.name, hex: req.body.hex })
             .then(result => res.json(result))
             .catch(err => res.status(400).json({ error: err.message }));
     },
