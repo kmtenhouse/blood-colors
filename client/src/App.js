@@ -24,26 +24,16 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     //bindings!
-    this.removeCaste = this.removeCaste.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleDrag = this.handleDrag.bind(this);
-    this.handleDragOver = this.handleDragOver.bind(this);
-    this.handleDrop = this.handleDrop.bind(this);
+    this.handleLockToggle = this.handleLockToggle.bind(this);
 
-    //first, go through all approved colors and make sure they're on spec...
-    //onSpec =true
-    onSpecCastes.forEach(caste=>caste.onSpec=true);
+    //first, go through all approved colors and make sure they're marked as on spec...
+    onSpecCastes.forEach(caste => caste.onSpec = true);
 
-    //...then do the opposite with offspec
-    //onSpec = false
-    //offSpecCastes.forEach(caste=>caste.onSpec=false);
-
-    //join those together and set in the state
-    //const allCastes = [].concat(onSpecCastes, offSpecCastes);
-
+    //then set the initial state
     this.state = {
-      castes: onSpecCastes, //allCastes,
+      castes: onSpecCastes,
       colors: [], //and no colors to distro just yet,
       yWeight: 1,
       uWeight: 0.25,
@@ -52,13 +42,15 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    canonTrolls.forEach(troll=>troll.definesCaste=true);
+    //Make sure the canon trolls define their castes to start out...
+    canonTrolls.forEach(troll => troll.definesCaste = true);
+    //...then distribute everything else accordingly :)
     const colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
     const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
     this.setState({ colors: assignedColors });
   }
 
-/*   Form handling */
+  /*   Form Handling */
   handleChange(e) {
     e.preventDefault();
     let { name, value } = e.target;
@@ -70,31 +62,27 @@ class App extends React.Component {
     //recalculate colors with new weighting
     let tempColors = this.distributeColors(this.state.colors, this.state.castes);
     this.setState({ colors: tempColors });
-
   }
 
-  /*  Drag and drop handling */
-  handleDrag(event, draggedColor) {
-   // event.preventDefault();
-    console.log(`Dragging ${draggedColor.name}`);
-    this.setState({
-      draggedColor: draggedColor
-    });
+  /* Color Lock Handling */
+  handleLockToggle(event, clickedColor) {
+    event.preventDefault();
+    let { _id } = clickedColor;
+    //find the relevant one in the color array and update...
+    let tempColors = this.state.colors;
+
+    //Note: we're using a vanilla for loop so we can break as soon as we find the relevant one
+    for (let i = 0; i < tempColors.length; i++) {
+      if (tempColors[i]._id === _id) {
+        tempColors[i].definesCaste = !tempColors[i].definesCaste;
+        break;
+      }
+    }
+    //...then reset state
+    this.setState({ colors: tempColors });
   }
 
-  handleDragOver(event) {
-    console.log("Drag over");
-    //event.preventDefault();
-  }
-
-  handleDrop(event) {
-    //event.preventDefault();
-    console.log(`Dropping ${this.state.draggedColor.name}`);
-    this.setState({
-      draggedColor: null
-    });
-  }
-
+  /* Helper functions to create ids */
   //borrowed from https://www.w3resource.com/javascript-exercises/javascript-math-exercise-23.php
   createUUID() {
     var dt = new Date().getTime();
@@ -106,18 +94,19 @@ class App extends React.Component {
     return uuid;
   }
 
+  /* Color Estimations */
   getRGBDistance(color, target) { //assumes both are objects with r, g, b keys
-    let rMean = ( target.r + color.r ) / 2;
+    let rMean = (target.r + color.r) / 2;
     let r = target.r - color.r;
     let g = target.g - color.g;
     let b = target.b - color.b;
-    return Math.sqrt((((512+rMean)*r*r)>>8) + 4*g*g + (((767-rMean)*b*b)>>8));
+    return Math.sqrt((((512 + rMean) * r * r) >> 8) + 4 * g * g + (((767 - rMean) * b * b) >> 8));
   }
 
   getYUVDistance(color, target) {
-    let yDiff = (target.y - color.y)*this.state.yWeight;
-    let uDiff = (target.u - color.u)*this.state.uWeight;
-    let vDiff = (target.v - color.v)*this.state.vWeight;
+    let yDiff = (target.y - color.y) * this.state.yWeight;
+    let uDiff = (target.u - color.u) * this.state.uWeight;
+    let vDiff = (target.v - color.v) * this.state.vWeight;
     let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
     return totalYUVFit;
   }
@@ -129,7 +118,7 @@ class App extends React.Component {
       //first, wipe out old info
       color.caste = 'indeterminate'; //default
       //We also prepare to look for which color is the current best fit
-      let bestFit = null; 
+      let bestFit = null;
 
       //NOTE: use an old-school for loop because we might break it early
       for (let i = 0; i < castes.length; i++) {
@@ -140,7 +129,7 @@ class App extends React.Component {
         let totalRGBFit = this.getRGBDistance(castes[i].RGB, color.RGB);
 
         let totalFit = totalRGBFit + totalYUVFit;
-        
+
         if (bestFit === null || totalFit < bestFit) {
           if (totalFit < 170 && totalRGBFit < 120) {
             //check if it's within our rgb constraints
@@ -157,29 +146,6 @@ class App extends React.Component {
     return colorsToDistro;
   }
 
-
-  removeCaste(casteToDelete) {
-    //first, remove the caste from the array
-
-    let tempCastes = this.state.castes;
-
-    //find and splice the offending one
-    const findCasteToDelete = (caste) => (caste._id === casteToDelete._id);
-    const indexToRemove = tempCastes.findIndex(findCasteToDelete);
-    tempCastes.splice(indexToRemove, 1);
-
-    //redistribute all colors based on the castes now availble 
-    let tempColors = this.state.colors;
-    tempColors = this.distributeColors(tempColors, tempCastes);
-
-    //set the new state
-    this.setState({
-      castes: tempCastes,
-      colors: tempColors
-    });
-
-  }
-
   render() {
 
     return (
@@ -190,20 +156,11 @@ class App extends React.Component {
           this.state.castes
             .filter(caste => caste.onSpec === true)
             .map(caste => (
-              <Tier caste={caste} key={caste._id} handleDragOver={this.handleDragOver} handleDrop={this.handleDrop} colors={this.state.colors.filter(color => color.caste === caste.name)}>
+              <Tier handleLockToggle={this.handleLockToggle} caste={caste} key={caste._id} colors={this.state.colors.filter(color => color.caste === caste.name)}>
               </Tier>
             ))
         }
         <Title>Off Spectrum</Title>
-{/*         {
-          this.state.castes
-            .filter(caste => caste.onSpec === false)
-            .map(caste => (
-              <Tier caste={caste} onDelete={this.removeCaste} key={caste._id} handleDragOver={this.handleDragOver} handleDrop={this.handleDrop} colors={this.state.colors.filter(color => color.caste === caste.name)}>
-              </Tier>
-            ))
-        }
- */}
         <Tier caste={{ name: '', caste: 'indeterminate' }} colors={this.state.colors.filter(color => color.caste === 'indeterminate')}>
         </Tier>
       </Container>

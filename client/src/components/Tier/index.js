@@ -28,14 +28,9 @@ function Tier(props) {
           </div>
         </div>
       </div>
-      <div className="row mb-2">
-        <div className="col-12 d-flex flex-row flex-wrap justify-content-start px-0 tier__definition">
-          <Collection caste={props.caste} colors={props.colors.filter(color => (color.hasOwnProperty('definesCaste') && color.definesCaste === true))} />
-        </div>
-      </div>
       <div className="row">
         <div className="col-12 d-flex flex-row flex-wrap justify-content-start px-0 tier__collection">
-          <Collection caste={props.caste} colors={props.colors} />
+          <Collection handleLockToggle={props.handleLockToggle} caste={props.caste} colors={props.colors} />
         </div>
       </div>
     </div>
