@@ -1,6 +1,6 @@
 const fs = require('fs');
-const newFileName = 'all-colors';
-const trollColors = require(`./data/${newFileName}`);
+const newFileName = 'hemospectrum-colors';
+const trollColors = require(`../../archive/data/${newFileName}`);
 
 const objectArr = trollColors.map(troll => {
     let rgbObj = hexToRGB(troll[0]);
@@ -9,7 +9,8 @@ const objectArr = trollColors.map(troll => {
         hex: troll[0],
         RGB: rgbObj,
         YUV: RGBtoYUV(rgbObj),
-        caste: '',
+        caste: troll[1],
+        onSpec: true,
         _id: createUUID()
     }
     return obj;
