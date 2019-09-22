@@ -27,6 +27,9 @@ module.exports = function() {
     );
     server.use(bodyParser.json());
 
+    //Set up static files
+    server.use(express.static(server.get(staticDir)));
+
     //Logging (for dev)
     server.use(morgan("dev"));
 

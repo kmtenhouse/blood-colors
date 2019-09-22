@@ -10,10 +10,10 @@ import Form from './components/Form';
 import { RGBtoYUV } from './utils/hex-conversion';
 
 /* Import local data sources */
-const onSpecCastes = require('./data/json/hemospectrum.json');
-const allColors = require('./data/json/all-colors.json');
-const canonTrolls = require('./data/json/canon-trolls.json');
-const veTrolls = require('./data/json/vast-error.json');
+const onSpecCastes = require('./data/json/hemospectrum.json.js');
+const allColors = require('./data/json/all-colors.json.js');
+const canonTrolls = require('./data/json/canon-trolls.json.js');
+const veTrolls = require('./data/json/vast-error.json.js');
 
 class App extends React.Component {
 
