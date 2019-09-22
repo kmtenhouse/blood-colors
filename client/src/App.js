@@ -13,7 +13,7 @@ import Form from './components/Form';
 /* import { RGBtoYUV, hexToRGB, hexToYUV } from './utils/hex-conversion'; */
 
 /* Import local data sources */
-const offSpecCastes = require('./data/json/off-spectrum.json');
+//const offSpecCastes = require('./data/json/off-spectrum.json');
 const onSpecCastes = require('./data/json/hemospectrum.json');
 const allColors = require('./data/json/all-colors.json');
 const canonTrolls = require('./data/json/canon-trolls.json');
@@ -27,20 +27,23 @@ class App extends React.Component {
     this.removeCaste = this.removeCaste.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-  
+    this.handleDrag = this.handleDrag.bind(this);
+    this.handleDragOver = this.handleDragOver.bind(this);
+    this.handleDrop = this.handleDrop.bind(this);
+
     //first, go through all approved colors and make sure they're on spec...
     //onSpec =true
     onSpecCastes.forEach(caste=>caste.onSpec=true);
 
     //...then do the opposite with offspec
     //onSpec = false
-    offSpecCastes.forEach(caste=>caste.onSpec=false);
+    //offSpecCastes.forEach(caste=>caste.onSpec=false);
 
     //join those together and set in the state
-    const allCastes = [].concat(onSpecCastes, offSpecCastes);
+    //const allCastes = [].concat(onSpecCastes, offSpecCastes);
 
     this.state = {
-      castes: allCastes,
+      castes: onSpecCastes, //allCastes,
       colors: [], //and no colors to distro just yet,
       yWeight: 1,
       uWeight: 0.25,
@@ -49,11 +52,13 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    canonTrolls.forEach(troll=>troll.definesCaste=true);
     const colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
     const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
     this.setState({ colors: assignedColors });
   }
 
+/*   Form handling */
   handleChange(e) {
     e.preventDefault();
     let { name, value } = e.target;
@@ -66,6 +71,28 @@ class App extends React.Component {
     let tempColors = this.distributeColors(this.state.colors, this.state.castes);
     this.setState({ colors: tempColors });
 
+  }
+
+  /*  Drag and drop handling */
+  handleDrag(event, draggedColor) {
+   // event.preventDefault();
+    console.log(`Dragging ${draggedColor.name}`);
+    this.setState({
+      draggedColor: draggedColor
+    });
+  }
+
+  handleDragOver(event) {
+    console.log("Drag over");
+    //event.preventDefault();
+  }
+
+  handleDrop(event) {
+    //event.preventDefault();
+    console.log(`Dropping ${this.state.draggedColor.name}`);
+    this.setState({
+      draggedColor: null
+    });
   }
 
   //borrowed from https://www.w3resource.com/javascript-exercises/javascript-math-exercise-23.php
@@ -127,7 +154,6 @@ class App extends React.Component {
       }
 
     });
-    console.log(colorsToDistro);
     return colorsToDistro;
   }
 
@@ -164,24 +190,21 @@ class App extends React.Component {
           this.state.castes
             .filter(caste => caste.onSpec === true)
             .map(caste => (
-              <Tier caste={caste} key={caste._id}>
-                <Collection caste={caste} colors={this.state.colors.filter(color => color.caste === caste.name)} />
+              <Tier caste={caste} key={caste._id} handleDragOver={this.handleDragOver} handleDrop={this.handleDrop} colors={this.state.colors.filter(color => color.caste === caste.name)}>
               </Tier>
             ))
         }
         <Title>Off Spectrum</Title>
-        {
+{/*         {
           this.state.castes
             .filter(caste => caste.onSpec === false)
             .map(caste => (
-              <Tier caste={caste} onDelete={this.removeCaste} key={caste._id}>
-                <Collection caste={caste} colors={this.state.colors.filter(color => color.caste === caste.name)} />
+              <Tier caste={caste} onDelete={this.removeCaste} key={caste._id} handleDragOver={this.handleDragOver} handleDrop={this.handleDrop} colors={this.state.colors.filter(color => color.caste === caste.name)}>
               </Tier>
             ))
         }
-        <Title>Could Not Determine Automagically</Title>
-        <Tier caste={{ name: 'indeterminate', caste: 'indeterminate' }}>
-          <Collection caste={{ name: 'indeterminate', caste: 'indeterminate' }} colors={this.state.colors.filter(color => color.caste === 'indeterminate')} />
+ */}
+        <Tier caste={{ name: '', caste: 'indeterminate' }} colors={this.state.colors.filter(color => color.caste === 'indeterminate')}>
         </Tier>
       </Container>
     );

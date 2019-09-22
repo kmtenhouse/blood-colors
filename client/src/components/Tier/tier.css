@@ -1,45 +1,53 @@
+.tier__definition, .tier__collection {
+    background-color: #c6c6c6;
+}
+
+.tier__definition {
+    border-bottom: 2px solid black;
+}
+
 .tier__button {
     font-size: x-large;
     font-weight: bold;
 }
 
-.tier__header {
-    width:100%;
-     max-width: 200px; 
-}
+ .tier {
+    width:100%; 
+      max-width: 200px;  
+} 
  
 @media (min-width: 321px) { 
-    .tier__header {
+    .tier {
         max-width: 300px;
     }
  }
 
 @media (min-width: 430px) { 
-    .tier__header {
+    .tier {
         max-width: 400px;
     }
  }
 
 @media (min-width: 530px) { 
-    .tier__header {
+    .tier {
         max-width: 500px;
     }
  }
 
 @media (min-width: 769px) { 
-    .tier__header {
+    .tier {
         max-width: 600px;
     }
  }
 
 @media (min-width: 992px) { 
-    .tier__header {
+    .tier {
         max-width: 900px;
     }
  }
 
 @media (min-width: 1200px) { 
-    .tier__header {
+    .tier {
         max-width: 1100px;
     }
  }
