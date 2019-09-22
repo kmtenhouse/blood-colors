@@ -1,16 +1,23 @@
+/* Import React */
 import React from 'react';
 import './App.css';
+
+/* Import components */
 import Tier from './components/Tier';
 import Container from './components/Container';
 import Collection from './components/Collection';
 import Title from './components/Title';
-import offSpec from './data/off-spectrum';
-import castes from './data/hemospectrum-colors';
-import allColors from './data/all-colors';
-import canonTrolls from './data/canon-trolls';
-import veTrolls from './data/vast-error';
-import { RGBtoYUV, hexToRGB, hexToYUV } from './utils/hex-conversion';
 import Form from './components/Form';
+
+/* Import functions */
+/* import { RGBtoYUV, hexToRGB, hexToYUV } from './utils/hex-conversion'; */
+
+/* Import local data sources */
+const offSpecCastes = require('./data/json/off-spectrum.json');
+const onSpecCastes = require('./data/json/hemospectrum.json');
+const allColors = require('./data/json/all-colors.json');
+const canonTrolls = require('./data/json/canon-trolls.json');
+const veTrolls = require('./data/json/vast-error.json');
 
 class App extends React.Component {
 
@@ -20,125 +27,31 @@ class App extends React.Component {
     this.removeCaste = this.removeCaste.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    //(TO-DO): make this an actual database so we have real ids askdlj
-
-    //castes are (currently) defined as a color object with a caste name and a boolean, on-spec or off-spec
+  
     //first, go through all approved colors and make sure they're on spec...
-    let onSpecCaste = castes.map(caste => {
-      let currCaste = this.createColorObject(caste);
-      currCaste.caste = caste[1];
-      currCaste.onSpec = true;
-      currCaste.yuv = hexToYUV(caste[0]);
-      currCaste.rgb = hexToRGB(caste[0]);
-      currCaste._id = this.createUUID();
-      return currCaste;
-    });
+    //onSpec =true
+    onSpecCastes.forEach(caste=>caste.onSpec=true);
 
     //...then do the opposite with offspec
-    let offSpecCaste = offSpec.map(caste => {
-      let currCaste = this.createColorObject(caste);
-      currCaste.onSpec = false;
-      currCaste.caste = caste[1];
-      currCaste.yuv = hexToYUV(caste[0]);
-      currCaste.rgb = hexToRGB(caste[0]);
-      currCaste._id = this.createUUID();
-      return currCaste;
-    });
+    //onSpec = false
+    offSpecCastes.forEach(caste=>caste.onSpec=false);
 
     //join those together and set in the state
-    const allCastes = [].concat(onSpecCaste, offSpecCaste);
+    const allCastes = [].concat(onSpecCastes, offSpecCastes);
 
     this.state = {
       castes: allCastes,
-      colors: [] //and no colors to distro just yet
+      colors: [], //and no colors to distro just yet,
+      yWeight: 1,
+      uWeight: 0.25,
+      vWeight: 0.25
     };
   }
 
   componentDidMount() {
-    const colorsToDistro = [].concat(canonTrolls, veTrolls, allColors).map(troll => this.createColorObject(troll));;
+    const colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
     const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
     this.setState({ colors: assignedColors });
-  }
-
-  //borrowed from https://www.w3resource.com/javascript-exercises/javascript-math-exercise-23.php
-  createUUID() {
-    var dt = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = (dt + Math.random() * 16) % 16 | 0;
-      dt = Math.floor(dt / 16);
-      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-    return uuid;
-  }
-
-  createColorObject(color) {
-    let newObj = {
-      hex: color[0],
-      name: color[1],
-      caste: ''
-    };
-    return newObj;
-  }
-
-  getRGBDistance(color, target) { //assumes both are objects with r, g, b keys
-/*     let rDiff = target.r - color.r;
-    let gDiff = target.g - color.g;
-    let bDiff = target.b - color.b;
-    let totalRGBFit = Math.sqrt(Math.pow(rDiff, 2) + Math.pow(gDiff, 2) + Math.pow(bDiff, 2));
-    return totalRGBFit; */
-    let rMean = ( target.r + color.r ) / 2;
-    let r = target.r - color.r;
-    let g = target.g - color.g;
-    let b = target.b - color.b;
-    return Math.sqrt((((512+rMean)*r*r)>>8) + 4*g*g + (((767-rMean)*b*b)>>8));
-  }
-
-  getYUVDistance(color, target) {
-    let yDiff = (target.y - color.y)*1;
-    let uDiff = (target.u - color.u)*0.25;
-    let vDiff = (target.v - color.v)*0.25;
-    let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
-    return totalYUVFit;
-  }
-
-  distributeColors(colorsToDistro, castes) {
-    //takes an array of color objects, and an array of caste objects
-    //go through the colors and get a fit / caste assignment for each
-    colorsToDistro.forEach(color => {
-      //get both the hex AND the yuv of the current color
-      let currColorRGB = hexToRGB(color.hex);
-      let currColorYUV = RGBtoYUV(currColorRGB);
-
-      //next, wipe out old info
-      color.fit = null;
-      color.caste = 'indeterminate'; //default
-
-      //NOTE: use an old-school for loop because we might break it early
-      for (let i = 0; i < castes.length; i++) {
-        //calculate the YUV diffs
-        let totalYUVFit = this.getYUVDistance(castes[i].yuv, currColorYUV);
-
-        //calculate the RGB diffs
-        let totalRGBFit = this.getRGBDistance(castes[i].rgb, currColorRGB);
-
-        let totalFit = totalRGBFit + totalYUVFit;
-
-        if (color.fit === null || totalFit < color.fit) {
-          if (totalFit < 170 && totalRGBFit < 120) {
-            //check if it's within our rgb constraints
-            color.fit = totalFit;
-            color.caste = castes[i].name;
-          }
-        } else if (color.fit === totalFit) { //if we find any dupes, make this indeterminate!
-          color.caste = 'indeterminate';
-          color.fit = null;
-          break;
-        }
-      }
-
-    });
-    console.log(colorsToDistro);
-    return colorsToDistro;
   }
 
   handleChange(e) {
@@ -153,6 +66,69 @@ class App extends React.Component {
     let tempColors = this.distributeColors(this.state.colors, this.state.castes);
     this.setState({ colors: tempColors });
 
+  }
+
+  //borrowed from https://www.w3resource.com/javascript-exercises/javascript-math-exercise-23.php
+  createUUID() {
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = (dt + Math.random() * 16) % 16 | 0;
+      dt = Math.floor(dt / 16);
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return uuid;
+  }
+
+  getRGBDistance(color, target) { //assumes both are objects with r, g, b keys
+    let rMean = ( target.r + color.r ) / 2;
+    let r = target.r - color.r;
+    let g = target.g - color.g;
+    let b = target.b - color.b;
+    return Math.sqrt((((512+rMean)*r*r)>>8) + 4*g*g + (((767-rMean)*b*b)>>8));
+  }
+
+  getYUVDistance(color, target) {
+    let yDiff = (target.y - color.y)*this.state.yWeight;
+    let uDiff = (target.u - color.u)*this.state.uWeight;
+    let vDiff = (target.v - color.v)*this.state.vWeight;
+    let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
+    return totalYUVFit;
+  }
+
+  distributeColors(colorsToDistro, castes) {
+    //takes an array of color objects, and an array of caste objects
+    //go through the colors and get a fit / caste assignment for each
+    colorsToDistro.forEach(color => {
+      //first, wipe out old info
+      color.caste = 'indeterminate'; //default
+      //We also prepare to look for which color is the current best fit
+      let bestFit = null; 
+
+      //NOTE: use an old-school for loop because we might break it early
+      for (let i = 0; i < castes.length; i++) {
+        //calculate the YUV diffs
+        let totalYUVFit = this.getYUVDistance(castes[i].YUV, color.YUV);
+
+        //calculate the RGB diffs
+        let totalRGBFit = this.getRGBDistance(castes[i].RGB, color.RGB);
+
+        let totalFit = totalRGBFit + totalYUVFit;
+        
+        if (bestFit === null || totalFit < bestFit) {
+          if (totalFit < 170 && totalRGBFit < 120) {
+            //check if it's within our rgb constraints
+            bestFit = totalFit;
+            color.caste = castes[i].name;
+          }
+        } else if (bestFit === totalFit) { //if we find any dupes, make this indeterminate!
+          color.caste = 'indeterminate';
+          break;
+        }
+      }
+
+    });
+    console.log(colorsToDistro);
+    return colorsToDistro;
   }
 
 
@@ -183,6 +159,7 @@ class App extends React.Component {
     return (
       <Container>
         <Title>Hemospectrum</Title>
+        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)
