@@ -5,15 +5,11 @@ import './App.css';
 /* Import components */
 import Tier from './components/Tier';
 import Container from './components/Container';
-import Collection from './components/Collection';
 import Title from './components/Title';
 import Form from './components/Form';
-
-/* Import functions */
-/* import { RGBtoYUV, hexToRGB, hexToYUV } from './utils/hex-conversion'; */
+import { RGBtoYUV } from './utils/hex-conversion';
 
 /* Import local data sources */
-const offSpecCastes = require('./data/json/off-spectrum.json');
 const onSpecCastes = require('./data/json/hemospectrum.json');
 const allColors = require('./data/json/all-colors.json');
 const canonTrolls = require('./data/json/canon-trolls.json');
@@ -24,50 +20,119 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     //bindings!
-    this.removeCaste = this.removeCaste.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-  
-    //first, go through all approved colors and make sure they're on spec...
-    //onSpec =true
-    onSpecCastes.forEach(caste=>caste.onSpec=true);
+    this.handleLockToggle = this.handleLockToggle.bind(this);
+    this.handleColorsReset = this.handleColorsReset.bind(this);
+    this.handleDropDown = this.handleDropDown.bind(this);
+    //next, go through all approved colors and make sure they're marked as on spec...
+    onSpecCastes.forEach(caste => caste.onSpec = true);
 
-    //...then do the opposite with offspec
-    //onSpec = false
-    offSpecCastes.forEach(caste=>caste.onSpec=false);
+    //and one final one that is not on spec
+    let offSpec = {
+      name: "indeterminate",
+      hex: "FFFFFF",
+      RGB: { r: 255, g: 255, b: 255 },
+      YUV: RGBtoYUV({ r: 255, g: 255, b: 255 }),
+      caste: "indeterminate", _id: this.createUUID()
+    };
 
-    //join those together and set in the state
-    const allCastes = [].concat(onSpecCastes, offSpecCastes);
+    onSpecCastes.push(offSpec);
 
+    //then set the initial state
     this.state = {
-      castes: allCastes,
-      colors: [], //and no colors to distro just yet,
+      definitions: onSpecCastes, //default caste definitions are what is on spec
+      castes: onSpecCastes,
+      colors: [], //no colors to distro just yet
       yWeight: 1,
       uWeight: 0.25,
-      vWeight: 0.25
+      vWeight: 0.25,
+      fitConstraint: 100
     };
   }
 
   componentDidMount() {
-    const colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
-    const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
-    this.setState({ colors: assignedColors });
+    //Make sure the canon trolls define their castes to start out...
+    canonTrolls.forEach(troll => troll.definesCaste = true);
+
+    //...then distribute everything else accordingly :)
+    this.setState({
+      definitions: [].concat(this.state.definitions, canonTrolls)
+    });
+
+    //next, distribute our colors based on these constraints
+    let colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
+    colorsToDistro = this.distributeColors(colorsToDistro);
+
+    this.setState({
+      colors: colorsToDistro,
+    });
   }
 
+  /*   Form Handling */
   handleChange(e) {
     e.preventDefault();
     let { name, value } = e.target;
     this.setState({ [name]: value });
   }
 
+  handleDropDown(event, colorToEdit) {
+    event.preventDefault();
+    let chosenCaste = event.target.value;
+    //forcibly update this item to be part of another caste (and lock it there to be sure)
+    let tempColors = this.state.colors;
+    //Note: we're using a vanilla for loop so we can break as soon as we find the relevant one
+    for (let i = 0; i < tempColors.length; i++) {
+      if (tempColors[i]._id === colorToEdit._id) {
+        console.log(chosenCaste.name);
+        tempColors[i].caste = chosenCaste;
+        tempColors[i].definesCaste = true;
+        break;
+      }
+    }
+    this.setState({ colors: this.distributeColors(tempColors) });
+  }
+
   handleSubmit(event) {
     event.preventDefault();
     //recalculate colors with new weighting
-    let tempColors = this.distributeColors(this.state.colors, this.state.castes);
-    this.setState({ colors: tempColors });
-
+    this.setState({ colors: this.distributeColors(this.state.colors) });
   }
 
+  handleColorsReset(event) {
+    event.preventDefault();
+    window.location.reload();
+  }
+
+  /* Color Lock Handling */
+  handleLockToggle(event, clickedColor) {
+    event.preventDefault();
+    let { _id } = clickedColor;
+    //find the relevant one in the color array and update...
+    let tempColors = this.state.colors;
+
+    //Note: we're using a vanilla for loop so we can break as soon as we find the relevant one
+    for (let i = 0; i < tempColors.length; i++) {
+      if (tempColors[i]._id === _id) {
+        //invert its lock state
+        tempColors[i].definesCaste = !tempColors[i].definesCaste;
+        //we also want to recalculate the caste in case we just unlocked it - maybe it should shuffle elsewhere
+        if (tempColors[i].definesCaste === false) {
+          tempColors[i].caste = this.determineCasteForOneColor(tempColors[i]);
+        } else {
+          //otherwise add it to our definitions!
+          let newDef = this.state.definitions;
+          newDef.push(tempColors[i]);
+          this.setState({ definitions: newDef });
+        }
+        break;
+      }
+    }
+    //...then reset state
+    this.setState({ colors: tempColors });
+  }
+
+  /* Helper functions to create ids */
   //borrowed from https://www.w3resource.com/javascript-exercises/javascript-math-exercise-23.php
   createUUID() {
     var dt = new Date().getTime();
@@ -79,79 +144,64 @@ class App extends React.Component {
     return uuid;
   }
 
+  /* Color Estimations */
   getRGBDistance(color, target) { //assumes both are objects with r, g, b keys
-    let rMean = ( target.r + color.r ) / 2;
+    let rMean = (target.r + color.r) / 2;
     let r = target.r - color.r;
     let g = target.g - color.g;
     let b = target.b - color.b;
-    return Math.sqrt((((512+rMean)*r*r)>>8) + 4*g*g + (((767-rMean)*b*b)>>8));
+    return Math.sqrt((((512 + rMean) * r * r) >> 8) + 4 * g * g + (((767 - rMean) * b * b) >> 8));
   }
 
-  getYUVDistance(color, target) {
-    let yDiff = (target.y - color.y)*this.state.yWeight;
-    let uDiff = (target.u - color.u)*this.state.uWeight;
-    let vDiff = (target.v - color.v)*this.state.vWeight;
-    let totalYUVFit = Math.sqrt(Math.pow(yDiff, 2) + Math.pow(uDiff, 2) + Math.pow(vDiff, 2));
-    return totalYUVFit;
-  }
+  determineCasteForOneColor(color) {
+    //takes in a single color and calculates its current caste
+    //returns the caste it belongs to (default: 'indeterminate')
 
-  distributeColors(colorsToDistro, castes) {
-    //takes an array of color objects, and an array of caste objects
-    //go through the colors and get a fit / caste assignment for each
-    colorsToDistro.forEach(color => {
-      //first, wipe out old info
-      color.caste = 'indeterminate'; //default
-      //We also prepare to look for which color is the current best fit
-      let bestFit = null; 
+    //first, we make an object to hold our counts
+    const casteFit = {};
+    this.state.castes.forEach(caste => {
+      casteFit[caste.name] = {
+        sum: 0,
+        count: 0
+      };
+    });
 
-      //NOTE: use an old-school for loop because we might break it early
-      for (let i = 0; i < castes.length; i++) {
-        //calculate the YUV diffs
-        let totalYUVFit = this.getYUVDistance(castes[i].YUV, color.YUV);
+    //now we calculate the average fit based on key colors
+    this.state.definitions.forEach(def => {
+      if (casteFit[def.name]) {
+        casteFit[def.name].sum += this.getRGBDistance(color.RGB, def.RGB);
+        casteFit[def.name].count++;
+      }
+    });
 
-        //calculate the RGB diffs
-        let totalRGBFit = this.getRGBDistance(castes[i].RGB, color.RGB);
+    //lastly, figure out the averages for each one and return the result
+    let bestCaste = "indeterminate";
+    let bestFit = null;
+    for (let caste in casteFit) {
+      let avgFit = casteFit[caste].sum / casteFit[caste].count;
 
-        let totalFit = totalRGBFit + totalYUVFit;
-        
-        if (bestFit === null || totalFit < bestFit) {
-          if (totalFit < 170 && totalRGBFit < 120) {
-            //check if it's within our rgb constraints
-            bestFit = totalFit;
-            color.caste = castes[i].name;
-          }
-        } else if (bestFit === totalFit) { //if we find any dupes, make this indeterminate!
-          color.caste = 'indeterminate';
-          break;
+      if (bestFit === null || (avgFit < bestFit)) {
+        if (avgFit < this.state.fitConstraint) {
+          bestFit = avgFit;
+          color.fit = bestFit;
+          bestCaste = caste;
         }
       }
-
-    });
-    console.log(colorsToDistro);
-    return colorsToDistro;
+    }
+    return bestCaste;
   }
 
-
-  removeCaste(casteToDelete) {
-    //first, remove the caste from the array
-
-    let tempCastes = this.state.castes;
-
-    //find and splice the offending one
-    const findCasteToDelete = (caste) => (caste._id === casteToDelete._id);
-    const indexToRemove = tempCastes.findIndex(findCasteToDelete);
-    tempCastes.splice(indexToRemove, 1);
-
-    //redistribute all colors based on the castes now availble 
-    let tempColors = this.state.colors;
-    tempColors = this.distributeColors(tempColors, tempCastes);
-
-    //set the new state
-    this.setState({
-      castes: tempCastes,
-      colors: tempColors
+  distributeColors(arr) {
+    //takes an array of color objects, and an array of caste objects
+    //go through the colors and get a fit / caste assignment for each
+    const colorsToDistro = arr.slice(0);
+    colorsToDistro.forEach(color => {
+      //Note: we don't determine the weight for something that is 'locked'
+      if (!color.definesCaste) {
+        color.caste = this.determineCasteForOneColor(color);
+      }
     });
-
+    return colorsToDistro;
   }
 
   render() {
@@ -159,30 +209,24 @@ class App extends React.Component {
     return (
       <Container>
         <Title>Hemospectrum</Title>
-        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
+        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} fitConstraint={this.state.fitConstraint} handleChange={this.handleChange} handleSubmit={this.handleSubmit} handleColorsReset={this.handleColorsReset} />
         {
           this.state.castes
-            .filter(caste => caste.onSpec === true)
+            /* .filter(caste => caste.onSpec === true) */
             .map(caste => (
-              <Tier caste={caste} key={caste._id}>
-                <Collection caste={caste} colors={this.state.colors.filter(color => color.caste === caste.name)} />
-              </Tier>
+              <React.Fragment key={caste._id}>
+                {(!caste.onSpec ? <Title>Off-Spectrum</Title> : '')}
+                <Tier
+                  handleLockToggle={this.handleLockToggle}
+                  handleDropDown={this.handleDropDown}
+                  caste={caste} 
+                  castes={this.state.castes}
+                  colors={this.state.colors.filter(color => color.caste === caste.name)}>
+                </Tier> 
+              </React.Fragment>
             ))
         }
-        <Title>Off Spectrum</Title>
-        {
-          this.state.castes
-            .filter(caste => caste.onSpec === false)
-            .map(caste => (
-              <Tier caste={caste} onDelete={this.removeCaste} key={caste._id}>
-                <Collection caste={caste} colors={this.state.colors.filter(color => color.caste === caste.name)} />
-              </Tier>
-            ))
-        }
-        <Title>Could Not Determine Automagically</Title>
-        <Tier caste={{ name: 'indeterminate', caste: 'indeterminate' }}>
-          <Collection caste={{ name: 'indeterminate', caste: 'indeterminate' }} colors={this.state.colors.filter(color => color.caste === 'indeterminate')} />
-        </Tier>
+
       </Container>
     );
   }
