@@ -38,6 +38,7 @@ function Form(props) {
         </div>
         <button type="submit" className="btn btn-secondary">Change Weighting</button>
       </div>
+      <button onClick={props.handleColorsReset} className="btn btn-secondary">Reset</button>
     </form>
 
   );

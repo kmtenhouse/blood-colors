@@ -26,14 +26,16 @@ class App extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleLockToggle = this.handleLockToggle.bind(this);
+    this.handleColorsReset = this.handleColorsReset.bind(this);
 
-    //first, go through all approved colors and make sure they're marked as on spec...
+    //next, go through all approved colors and make sure they're marked as on spec...
+    //(TO-DO) fix this
     onSpecCastes.forEach(caste => caste.onSpec = true);
 
     //then set the initial state
     this.state = {
       castes: onSpecCastes,
-      colors: [], //and no colors to distro just yet,
+      colors: [], //no colors to distro just yet
       yWeight: 1,
       uWeight: 0.25,
       vWeight: 0.25
@@ -44,9 +46,16 @@ class App extends React.Component {
     //Make sure the canon trolls define their castes to start out...
     canonTrolls.forEach(troll => troll.definesCaste = true);
     //...then distribute everything else accordingly :)
-    const colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
-    const assignedColors = this.distributeColors(colorsToDistro, this.state.castes);
-    this.setState({ colors: assignedColors });
+
+    let colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
+    this.setState({
+      yWeight: 1,
+      uWeight: 0.25,
+      vWeight: 0.25
+    });
+
+    colorsToDistro = this.distributeColors(colorsToDistro);
+    this.setState({ colors: colorsToDistro });
   }
 
   /*   Form Handling */
@@ -59,8 +68,12 @@ class App extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     //recalculate colors with new weighting
-    let tempColors = this.distributeColors(this.state.colors, this.state.castes);
-    this.setState({ colors: tempColors });
+    this.setState({ colors: this.distributeColors(this.state.colors) });
+  }
+
+  handleColorsReset(event) {
+    event.preventDefault();
+    window.location.reload();
   }
 
   /* Color Lock Handling */
@@ -73,7 +86,12 @@ class App extends React.Component {
     //Note: we're using a vanilla for loop so we can break as soon as we find the relevant one
     for (let i = 0; i < tempColors.length; i++) {
       if (tempColors[i]._id === _id) {
+        //invert its lock state
         tempColors[i].definesCaste = !tempColors[i].definesCaste;
+        //we also want to recalculate the caste in case we just unlocked it - maybe it should shuffle elsewhere
+        if (tempColors[i].definesCaste === false) {
+          tempColors[i].caste = this.determineCasteForOneColor(tempColors[i]);
+        }
         break;
       }
     }
@@ -110,37 +128,50 @@ class App extends React.Component {
     return totalYUVFit;
   }
 
-  distributeColors(colorsToDistro, castes) {
+  determineCasteForOneColor(color) {
+    //takes in a single color and calculates its current caste
+    //grab our current caste definitions
+    //TO-DO: REFACTOR
+    const castes = this.state.castes;
+
+    //We also prepare to look for which color is the current best fit
+    let bestFit = null;
+    let newCaste = 'indeterminate';
+
+    //NOTE: use an old-school for loop because we might break it early
+    for (let i = 0; i < castes.length; i++) {
+      //calculate the YUV diffs
+      let totalYUVFit = this.getYUVDistance(castes[i].YUV, color.YUV);
+
+      //calculate the RGB diffs
+      let totalRGBFit = this.getRGBDistance(castes[i].RGB, color.RGB);
+
+      let totalFit = totalRGBFit + totalYUVFit;
+
+      if (bestFit === null || totalFit < bestFit) {
+        if (totalFit < 170 && totalRGBFit < 120) {
+          //check if it's within our rgb constraints
+          bestFit = totalFit;
+          newCaste = castes[i].name; //TO-DO: Refactor to use IDs instead 
+        }
+      } else if (bestFit === totalFit) { //if we find any dupes, make this indeterminate!
+        newCaste = 'indeterminate';
+        break;
+      }
+    }
+
+    return newCaste;
+  }
+
+  distributeColors(arr) {
     //takes an array of color objects, and an array of caste objects
     //go through the colors and get a fit / caste assignment for each
+    const colorsToDistro = arr.slice(0);
     colorsToDistro.forEach(color => {
-      //first, wipe out old info
-      color.caste = 'indeterminate'; //default
-      //We also prepare to look for which color is the current best fit
-      let bestFit = null;
-
-      //NOTE: use an old-school for loop because we might break it early
-      for (let i = 0; i < castes.length; i++) {
-        //calculate the YUV diffs
-        let totalYUVFit = this.getYUVDistance(castes[i].YUV, color.YUV);
-
-        //calculate the RGB diffs
-        let totalRGBFit = this.getRGBDistance(castes[i].RGB, color.RGB);
-
-        let totalFit = totalRGBFit + totalYUVFit;
-
-        if (bestFit === null || totalFit < bestFit) {
-          if (totalFit < 170 && totalRGBFit < 120) {
-            //check if it's within our rgb constraints
-            bestFit = totalFit;
-            color.caste = castes[i].name;
-          }
-        } else if (bestFit === totalFit) { //if we find any dupes, make this indeterminate!
-          color.caste = 'indeterminate';
-          break;
-        }
+      //Note: we don't determine the weight for something that is 'locked'
+      if (!color.definesCaste || (color.definesCaste && color.caste === '')) {
+        color.caste = this.determineCasteForOneColor(color);
       }
-
     });
     return colorsToDistro;
   }
@@ -150,7 +181,7 @@ class App extends React.Component {
     return (
       <Container>
         <Title>Hemospectrum</Title>
-        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} handleChange={this.handleChange} handleSubmit={this.handleSubmit} /> 
+        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} handleChange={this.handleChange} handleSubmit={this.handleSubmit} handleColorsReset={this.handleColorsReset} />
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)
