@@ -7,6 +7,7 @@ import Tier from './components/Tier';
 import Container from './components/Container';
 import Title from './components/Title';
 import Form from './components/Form';
+import { RGBtoYUV } from './utils/hex-conversion';
 
 /* Import local data sources */
 const onSpecCastes = require('./data/json/hemospectrum.json');
@@ -26,6 +27,17 @@ class App extends React.Component {
     this.handleDropDown = this.handleDropDown.bind(this);
     //next, go through all approved colors and make sure they're marked as on spec...
     onSpecCastes.forEach(caste => caste.onSpec = true);
+
+    //and one final one that is not on spec
+    let offSpec = {
+      name: "indeterminate",
+      hex: "FFFFFF",
+      RGB: { r: 255, g: 255, b: 255 },
+      YUV: RGBtoYUV({ r: 255, g: 255, b: 255 }),
+      caste: "indeterminate", _id: this.createUUID()
+    };
+
+    onSpecCastes.push(offSpec);
 
     //then set the initial state
     this.state = {
@@ -49,7 +61,7 @@ class App extends React.Component {
     });
 
     //next, distribute our colors based on these constraints
-    let colorsToDistro = [].concat(canonTrolls , veTrolls, allColors);
+    let colorsToDistro = [].concat(canonTrolls, veTrolls, allColors);
     colorsToDistro = this.distributeColors(colorsToDistro);
 
     this.setState({
@@ -71,7 +83,7 @@ class App extends React.Component {
     let tempColors = this.state.colors;
     //Note: we're using a vanilla for loop so we can break as soon as we find the relevant one
     for (let i = 0; i < tempColors.length; i++) {
-      if(tempColors[i]._id===colorToEdit._id) {
+      if (tempColors[i]._id === colorToEdit._id) {
         console.log(chosenCaste.name);
         tempColors[i].caste = chosenCaste;
         tempColors[i].definesCaste = true;
@@ -200,20 +212,21 @@ class App extends React.Component {
         <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} fitConstraint={this.state.fitConstraint} handleChange={this.handleChange} handleSubmit={this.handleSubmit} handleColorsReset={this.handleColorsReset} />
         {
           this.state.castes
-            .filter(caste => caste.onSpec === true)
+            /* .filter(caste => caste.onSpec === true) */
             .map(caste => (
-              <Tier
-                handleLockToggle={this.handleLockToggle}
-                handleDropDown={this.handleDropDown}
-                caste={caste} key={caste._id}
-                castes={this.state.castes}
-                colors={this.state.colors.filter(color => color.caste === caste.name).sort((a, b) => ((!b.hasOwnProperty('fit') || a.fit > b.fit) ? 1 : -1))}>
-              </Tier>
+              <React.Fragment key={caste._id}>
+                {(!caste.onSpec ? <Title>Off-Spectrum</Title> : '')}
+                <Tier
+                  handleLockToggle={this.handleLockToggle}
+                  handleDropDown={this.handleDropDown}
+                  caste={caste} 
+                  castes={this.state.castes}
+                  colors={this.state.colors.filter(color => color.caste === caste.name)}>
+                </Tier> 
+              </React.Fragment>
             ))
         }
-        <Title>Off Spectrum</Title>
-        <Tier handleLockToggle={this.handleLockToggle} caste={{ name: '', caste: 'indeterminate' }} colors={this.state.colors.filter(color => color.caste === 'indeterminate')}>
-        </Tier>
+
       </Container>
     );
   }
