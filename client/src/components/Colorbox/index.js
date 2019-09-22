@@ -20,7 +20,7 @@ function Colorbox(props) {
     <div className="colorbox" onClick={(event)=>{props.handleLockToggle(event, props.color)}} style={style}>
       <ul className="colorbox__info">
         <li className="colorbox__label">{(props.color.hasOwnProperty('name') ? props.color.name : '')}</li>
-        <li className="colorbox__label"> {(props.color.hasOwnProperty('hex') ? props.color.hex : '')}</li>
+        <li className="colorbox__label"> {(props.color.hasOwnProperty('hex') ? props.color.hex : '')}</li> 
         <li className="colorbox__label"><i className={materialIconClasses}>{materialIcon}</i></li>
       </ul>
     </div>

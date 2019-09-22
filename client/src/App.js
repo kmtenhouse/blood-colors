@@ -8,11 +8,7 @@ import Container from './components/Container';
 import Title from './components/Title';
 import Form from './components/Form';
 
-/* Import functions */
-/* import { RGBtoYUV, hexToRGB, hexToYUV } from './utils/hex-conversion'; */
-
 /* Import local data sources */
-//const offSpecCastes = require('./data/json/off-spectrum.json');
 const onSpecCastes = require('./data/json/hemospectrum.json');
 const allColors = require('./data/json/all-colors.json');
 const canonTrolls = require('./data/json/canon-trolls.json');
@@ -192,12 +188,15 @@ class App extends React.Component {
     return (
       <Container>
         <Title>Hemospectrum</Title>
-        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} handleChange={this.handleChange} handleSubmit={this.handleSubmit} handleColorsReset={this.handleColorsReset} />
+        <Form yWeight={this.state.yWeight} uWeight={this.state.uWeight} vWeight={this.state.vWeight} fitConstraint={this.state.fitConstraint} handleChange={this.handleChange} handleSubmit={this.handleSubmit} handleColorsReset={this.handleColorsReset} />
         {
           this.state.castes
             .filter(caste => caste.onSpec === true)
             .map(caste => (
-              <Tier handleLockToggle={this.handleLockToggle} caste={caste} key={caste._id} colors={this.state.colors.filter(color => color.caste === caste.name)}>
+              <Tier
+                handleLockToggle={this.handleLockToggle}
+                caste={caste} key={caste._id}
+                colors={this.state.colors.filter(color => color.caste === caste.name).sort((a, b) => ( (!b.hasOwnProperty('fit') || a.fit > b.fit) ? 1 : -1)) }>
               </Tier>
             ))
         }

@@ -7,38 +7,19 @@ function Form(props) {
       <div className="form-row">
 
         <div className="col">
-          <label className="sr-only" htmlFor="yWeight">Y</label>
+          <label className="sr-only" htmlFor="fitConstraint">Fit</label>
           <div className="input-group mb-2">
             <div className="input-group-prepend">
-              <div className="input-group-text">Y</div>
+              <div className="input-group-text">Fit</div>
             </div>
-            <input type="number" min="0" step="0.05" className="form-control" id="yWeight" name="yWeight" value={props.yWeight} onChange={props.handleChange} />
+            <input type="number" min="0" step="1" className="form-control" id="fitConstraint" name="fitConstraint" value={props.fitConstraint} onChange={props.handleChange} />
           </div>
         </div>
 
-        <div className="col">
-          <label className="sr-only" htmlFor="uWeight">U</label>
-          <div className="input-group mb-2">
-            <div className="input-group-prepend">
-              <div className="input-group-text">U</div>
-            </div>
-            <input type="number" min="0" step="0.05" className="form-control" id="uWeight" name="uWeight" value={props.uWeight} onChange={props.handleChange} />
-          </div>
-        </div>
-
-        <div className="col">
-          <label className="sr-only" htmlFor="vWeight">V</label>
-          <div className="input-group mb-2">
-            <div className="input-group-prepend">
-              <div className="input-group-text">V</div>
-            </div>
-            <input type="number" min="0" step="0.05" className="form-control" id="vWeight" name="vWeight" value={props.vWeight} onChange={props.handleChange} />
-          </div>
-
-        </div>
-        <button type="submit" className="btn btn-secondary">Change Weighting</button>
+        <button type="submit" className="btn btn-primary mx-2">Update</button>
+        <button onClick={props.handleColorsReset} className="btn btn-secondary">Reset</button>
       </div>
-      <button onClick={props.handleColorsReset} className="btn btn-secondary">Reset</button>
+      
     </form>
 
   );
