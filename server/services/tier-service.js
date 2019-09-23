@@ -27,9 +27,9 @@ module.exports = {
             }
 
             //you may also optionally provide an integer to order the tiers 
-            if(tierObj.order) {
+            if (tierObj.order) {
                 console.log(tierObj.order);
-                if(Number.isNaN(parseFloat(tierObj.order))) {
+                if (Number.isNaN(parseFloat(tierObj.order))) {
                     reject(new Error("Order must be a number!"));
                 }
                 tierObj.order = parseFloat(tierObj.order);
@@ -52,6 +52,30 @@ module.exports = {
             }
         });
 
+    },
+
+    updateOneById: function (updateObj) {
+        return new Promise(async (resolve, reject) => {
+            //check if we're receiving a valid mongo id
+            try {
+                if (!updateObj._id || /^[0-9a-fA-F]{24}$/.test(updateObj._id) === false) {
+                    reject(new Error("Must provide a valid id to update!"));
+                }
+
+                //the only things we can update right now are the name
+                if (!updateObj.name || typeof updateObj.name !== "string") {
+                    reject(new Error("Must provide a string for the new name!"));
+                }
+
+                let tierToUpdate = await Tier.findById(updateObj._id);
+                tierToUpdate.name = updateObj.name;
+                await tierToUpdate.save();
+                resolve(tierToUpdate.populate("displayColor").execPopulate());
+            }
+            catch (err) {
+                reject(err);
+            }
+        })
     },
 
     deleteOne: function (id) {

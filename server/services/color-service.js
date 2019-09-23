@@ -61,14 +61,15 @@ module.exports = {
                     reject(new Error("Must provide a string for the new name!"));
                 }
 
-                let colorToUpdate = await Color.findOneAndUpdate(updateObj._id, { name: updateObj.name }, {new: true});
+                let colorToUpdate = await Color.findById(updateObj._id);
+                colorToUpdate.name = updateObj.name;
+                await colorToUpdate.save();
                 resolve(colorToUpdate);
             }
             catch (err) {
                 reject(err);
             }
         })
-
     },
 
     deleteOne: function (id) {
