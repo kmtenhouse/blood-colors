@@ -5,7 +5,7 @@ const getContrastColor = require("../services/utils/hex-conversion").getContrast
 module.exports = {
     findOneById: async function (req, res) {
         try {
-            const result = await Tier.findById({ _id: req.params.id }).populate("displayColor");
+            const result = await Tier.findById({ _id: req.params.id }).populate("displayColor").populate("colors");
             return res.status(200).json(result);
         } catch (err) {
             return res.sendStatus(500);
@@ -68,6 +68,7 @@ module.exports = {
         }
     },
     updateOneById: async function (req, res) {
+        console.log(req.body);
         //Check that we're trying to update the same item that we are hitting via the route -- don't want any mismatches!
         try {
             //AUTO REJECT:
@@ -86,7 +87,7 @@ module.exports = {
 
             //POSSIBLE FIELDS TO UPDATE:
             //Name:
-            if (req.body.name !== "undefined") {
+            if (req.body.name) {
                 if (typeof req.body.name !== "string") {
                     return res.status(400).json({ error: "Must provide a string for the new name!" });
                 }
@@ -94,11 +95,19 @@ module.exports = {
             }
 
             //Order:
-            if(req.body.order !== "undefined") {
+            if(req.body.order) {
                 if( Number.isNaN(parseFloat(req.body.order))) {
                     return res.status(400).json({ error: "Must provide a valid number for the order!" });
                 }
                 tierToUpdate.order = parseFloat(req.body.order);
+            }
+
+            //Color Array:
+            if(req.body.colors) {
+                if(!Array.isArray(req.body.colors)) {
+                    return res.status(400).json({ error: "Must provide color ids in an array!" });
+                }
+                tierToUpdate.colors = req.body.colors;
             }
 
             await tierToUpdate.save();
