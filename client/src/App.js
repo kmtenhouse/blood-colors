@@ -3,11 +3,8 @@ import React from 'react';
 import './App.css';
 
 /* Import components */
-import Tier from './components/Tier';
 import Container from './components/Container';
-import Title from './components/Title';
-import Form from './components/Form';
-import { RGBtoYUV } from './utils/hex-conversion';
+import Spectrum from './components/Spectrum';
 
 /* Import local data sources */
 
@@ -34,8 +31,14 @@ class App extends React.Component {
 
     return (
       <Container>
-        <Title>Hemospectrum</Title>
-        
+
+        <Spectrum title="Hemospectrum">
+          <h2>Test</h2>
+        </Spectrum>
+
+        <Spectrum title="Off Spectrum">
+          <h2>Test</h2>
+        </Spectrum>
       </Container>
     );
   }
