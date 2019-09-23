@@ -37,7 +37,7 @@ module.exports = {
 
             //calculate the rgb values
 
-            Color.create(colorObj)
+            Color.create({ name: colorObj.name, hex: colorObj.hex, contrastColor: colorObj.contrastColor })
                 .then(result => resolve(result))
                 .catch(err => reject(err));
         });
