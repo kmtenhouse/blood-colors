@@ -13,7 +13,6 @@ module.exports = {
     },
 
     createOne: function (colorObj) {
-        console.log(colorObj);
         return new Promise((resolve, reject) => {
             //Minimum info you must provide is the hex!
             if (!colorObj || !colorObj.hex || /^#?[0-9a-fA-F]{6}$/.test(colorObj.hex) === false) {

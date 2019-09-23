@@ -16,39 +16,29 @@ module.exports = {
 
     createOne: function (tierObj) {
         return new Promise(async (resolve, reject) => {
-            //minimum info we need is a hex for the color we want to make core
+            //minimum info we need is a hex for the color we want to make core, and also a name
             if (!tierObj || !tierObj.hex) {
                 reject(new Error("Must provide valid hex! (six digit version)"))
             }
 
-            //tiers can also have human-readable names  - while this is highly recommended, it is not strictly required
-            if (tierObj.name) {
-                if (typeof (tierObj.name) !== "string") { //if you do provide the name, it has to be a string 
-                    reject(new Error("Must provide valid name for the tier!"));
-                }
-            } else {
-                tierObj.name = "";
+            if (!tierObj.name || typeof tierObj.name !== "string") {
+                reject(new Error("Must provide a name for the tier!"));
             }
+
 
             //now, attempt to create a color with the hex we got
             //if that fails, we reject
             try {
-                const newColor = await colorSvc.createOne({ name: tierObj.name, hex: tierObj.hex });
+                const newColorName = tierObj.name.charAt(0).toUpperCase() + tierObj.name.slice(1).toLowerCase();
+                const newColor = await colorSvc.createOne({ name: `${newColorName} Tier - Base Color`, hex: tierObj.hex });
                 const idToAssoc = newColor._id;
-                
-                const newTier = await Tier.create({name: tierObj.name, displayColor: idToAssoc});
-                resolve(newTier.populate('displayColor').execPopulate()); 
 
-            } catch(err) {
+                const newTier = await Tier.create({ name: tierObj.name, displayColor: idToAssoc });
+                resolve(newTier.populate('displayColor').execPopulate());
+
+            } catch (err) {
                 reject(err);
             }
-
-/*             colorSvc.createOne({ name: tierObj.name, hex: tierObj.hex })
-                .then(result=>resolve(result))
-                .catch(err=>reject(err)); */
-            /*            Tier.create({ name: tierObj.name })
-                           .then(result => resolve(result))
-                           .catch(err => reject(err)); */
         });
 
     },
