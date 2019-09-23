@@ -15,7 +15,7 @@ module.exports = {
     },
 
     createOne: function (tierObj) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             //minimum info we need is a hex for the color we want to make core
             if (!tierObj || !tierObj.hex) {
                 reject(new Error("Must provide valid hex! (six digit version)"))
@@ -23,7 +23,7 @@ module.exports = {
 
             //tiers can also have human-readable names  - while this is highly recommended, it is not strictly required
             if (tierObj.name) {
-                if (typeof (tierObj.name) !== "string") { //if you do provide the name, it has to be a string tho
+                if (typeof (tierObj.name) !== "string") { //if you do provide the name, it has to be a string 
                     reject(new Error("Must provide valid name for the tier!"));
                 }
             } else {
@@ -32,9 +32,20 @@ module.exports = {
 
             //now, attempt to create a color with the hex we got
             //if that fails, we reject
-            colorSvc.createOne({ name: tierObj.name, hex: tierObj.hex })
+            try {
+                const newColor = await colorSvc.createOne({ name: tierObj.name, hex: tierObj.hex });
+                const idToAssoc = newColor._id;
+                
+                const newTier = await Tier.create({name: tierObj.name, displayColor: idToAssoc});
+                resolve(newTier.populate('displayColor').execPopulate()); 
+
+            } catch(err) {
+                reject(err);
+            }
+
+/*             colorSvc.createOne({ name: tierObj.name, hex: tierObj.hex })
                 .then(result=>resolve(result))
-                .catch(err=>reject(err));
+                .catch(err=>reject(err)); */
             /*            Tier.create({ name: tierObj.name })
                            .then(result => resolve(result))
                            .catch(err => reject(err)); */
