@@ -51,7 +51,7 @@ class App extends React.Component {
         //also get all colors
         const allColors = await axios.get(`${baseURL}/api/colors`);
         const colors = allColors.data;
-        
+
         this.setState({ tiers, colors });
       })
       .catch(err => console.log("Error:", err));
@@ -75,13 +75,14 @@ class App extends React.Component {
           )}
         </Spectrum>
 
-        <Palette>
-          {this.state.colors.map(color => (
-            <Colorbox key={color._id} color={color} />
-          )
-          )}
-        </Palette>
-
+        <Spectrum title="Off Spectrum">
+          <Palette>
+            {this.state.colors.map(color => (
+              <Colorbox key={color._id} color={color} />
+            )
+            )}
+          </Palette>
+        </Spectrum>
       </Container>
     );
   }

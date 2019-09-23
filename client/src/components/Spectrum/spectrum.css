@@ -3,7 +3,6 @@
     width: 100%;
     margin: 0;
     padding: 0;
-    border: 1px solid red;
 }
 
 .spectrum__title {
@@ -15,7 +14,7 @@
 /* Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) { 
     .spectrum {
-        max-width: 500px;
+        width: 500px;
         margin: 2em auto;
     }    
 }
@@ -23,20 +22,20 @@
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) { 
     .spectrum {
-        max-width: 700px;
+        width: 700px;
     } 
 }
 
 /* Large devices (desktops, 992px and up) */
 @media (min-width: 992px) { 
     .spectrum {
-        max-width: 900px;
+        width: 900px;
     } 
 }
 
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) { 
     .spectrum {
-        max-width: 1000px;
+        width: 1240px;
     } 
 }
