@@ -8,33 +8,38 @@ module.exports = {
         return Color.find({});
     },
 
-    findOneById: function(colorId) {
-        return Color.findById({_id: colorId});
+    findOneById: function (colorId) {
+        return Color.findById({ _id: colorId });
     },
 
     createOne: function (colorObj) {
         console.log(colorObj);
         return new Promise((resolve, reject) => {
-            if (!colorObj || !colorObj.hasOwnProperty("name") || typeof (colorObj.name) !== "string" || colorObj.name === "") {
-                reject(new Error("Must provide valid name!"))
+            //Minimum info you must provide is the hex!
+            if (!colorObj || !colorObj.hex || /^#?[0-9a-fA-F]{6}$/.test(colorObj.hex) === false) {
+                reject(new Error("Must provide valid hex! (six digit version)"))
             }
 
-            if (!colorObj || !colorObj.hasOwnProperty("hex") || /^#?[0-9a-fA-F]{6}$/.test(colorObj.hex) === false) {
-                reject(new Error("Must provide valid hex! (Six digit version)"))
+            //You may optionally provide a name, but that must be a string
+            if (colorObj.name) {
+                if (typeof (colorObj.name) !== "string") {
+                    reject(new Error("Must provide valid name for the color!"));
+                }
+            } else {
+                colorObj.name = "";
             }
 
-            //congrats, we have a valid object!  now let's store things reasonably
-            //add the # if it's missing
+            //if we got to this stage, congrats, we have a valid object!  now let's store things reasonably
+            //add the # to the hex if it's missing
             colorObj.hex = (/^#{1}/.test(colorObj.hex) ? colorObj.hex : "#" + colorObj.hex);
 
-            //calculate the contrast color
+            //calculate a reasonable contrast color
             try {
                 colorObj.contrastColor = "#" + getContrastColor(colorObj.hex);
-            } catch(err) {
-               console.log(err);
-               reject(new Error("An internal error occurred"));
+            } catch (err) {
+                reject(new Error("Internal server error"));
             }
-
+            //(To-do)
             //calculate the rgb values
 
             Color.create({ name: colorObj.name, hex: colorObj.hex, contrastColor: colorObj.contrastColor })
