@@ -15,6 +15,7 @@ module.exports = {
     },
 
     createOne: function (tierObj) {
+        console.log(tierObj);
         return new Promise(async (resolve, reject) => {
             //minimum info we need is a hex for the color we want to make core, and also a name
             if (!tierObj || !tierObj.hex) {
@@ -25,6 +26,16 @@ module.exports = {
                 reject(new Error("Must provide a name for the tier!"));
             }
 
+            //you may also optionally provide an integer to order the tiers 
+            if(tierObj.order) {
+                console.log(tierObj.order);
+                if(Number.isNaN(parseInt(tierObj.order))) {
+                    reject(new Error("Order must be an integer!"));
+                }
+                tierObj.order = parseInt(tierObj.order);
+            } else {
+                tierObj.order = 0;
+            }
 
             //now, attempt to create a color with the hex we got
             //if that fails, we reject
@@ -33,7 +44,7 @@ module.exports = {
                 const newColor = await colorSvc.createOne({ name: `${newColorName} Tier - Base Color`, hex: tierObj.hex });
                 const idToAssoc = newColor._id;
 
-                const newTier = await Tier.create({ name: tierObj.name, displayColor: idToAssoc });
+                const newTier = await Tier.create({ name: tierObj.name, displayColor: idToAssoc, order: tierObj.order });
                 resolve(newTier.populate('displayColor').execPopulate());
 
             } catch (err) {
