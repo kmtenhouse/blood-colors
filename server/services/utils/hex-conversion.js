@@ -1,5 +1,4 @@
 function hexToRGB(str) {
-    console.log(typeof str);
     if (str.charAt(0) === "#") {
         str = str.slice(1);
     }
