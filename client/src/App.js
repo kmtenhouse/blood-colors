@@ -1,5 +1,11 @@
 /* Import React */
 import React from 'react';
+
+/* Import Axios for requests */
+import axios from 'axios';
+
+
+/* Import CSS (for App) */
 import './App.css';
 
 /* Import components */
@@ -8,6 +14,7 @@ import Spectrum from './components/Spectrum';
 import Tier from './components/Tier';
 
 /* Import local data sources */
+const baseURL = "http://localhost:3001"
 
 class App extends React.Component {
 
@@ -23,26 +30,13 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    //test data!
-    const fakeTier = {
-      name: "Rustie",
-      order: 0,
-      colors: [],
-      _id: "5d888c1b46a0a604a402e950",
-      displayColor: {
-        name: "Rust - Aradia Tier",
-        _id: "5d886724bd4b55584cbb1a8e",
-        hex: "#a10000",
-        contrastColor: "#FFFFFF",
-        date: "2019-09-23T09:10:51.642Z",
-        __v: 0
-      },
-      date: "2019-09-23T09:10:51.647Z",
-      __v: 0
-    };
-
-    this.setState({ tiers: [fakeTier] });
-
+    //perform an axios call to get our tiers
+    axios.get(`${baseURL}/api/tiers`)
+      .then(res => {
+        const tiers = res.data;
+        this.setState({ tiers });
+      })
+      .catch(err => console.log("Error:", err));
   }
 
   /*   Form Handling */
