@@ -3,20 +3,33 @@ import './tier.css';
 
 
 function Tier(props) {
-  const { color, name} = props;
-  console.log(color);
-  const tierColors = { 
-    backgroundColor: ( (color && color.hex) ? color.hex : "#000000"),
-    color: ( (color && color.contrastColor) ? color.contrastColor : "#FFFFFF")
+  //Deconstruct the props
+  const { displayColor, name, colors } = props;
+  const colorsToShow = (colors ? colors : []);
+
+  //Set values for the tier's overall styling
+  const hex = ((displayColor && displayColor.hasOwnProperty('hex')) ? displayColor.hex : "#000000");
+  const contrastColor = ((displayColor && displayColor.hasOwnProperty('contrastColor')) ? displayColor.contrastColor : "#FFFFFF");
+
+  const tierColors = {
+    backgroundColor: hex,
+    color: contrastColor
   };
 
+  //Make the tier names more legible (if necessary)
+  let nameToShow = "";
+  if(name) {
+    nameToShow = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  }
 
   return (
     <div className="tier">
       <div className="tier__header" style={tierColors}>
-        <h2 className="tier__title">{(name ? name : '')}</h2>
+        <h2 className="tier__title">{nameToShow}</h2>
       </div>
-      <div className="tier__collection">Collection goes here</div>
+      <div className="tier__collection">
+        {(colorsToShow.map(color => <div>Hi</div>))}
+      </div>
     </div>
   );
 }

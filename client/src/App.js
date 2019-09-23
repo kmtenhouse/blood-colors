@@ -51,7 +51,7 @@ class App extends React.Component {
       <Container>
         <Spectrum title="Hemospectrum">
           {this.state.tiers.map(tier => (
-            <Tier key={tier._id} name={tier.name} color={tier.displayColor} >
+            <Tier key={tier._id} name={tier.name} displayColor={tier.displayColor} >
             </Tier>)
           )}
         </Spectrum>
