@@ -1,10 +1,12 @@
 import React from 'react';
 import './tier.css';
+import Colorbox from '../Colorbox';
 
 
 function Tier(props) {
   //Deconstruct the props
   const { displayColor, name, colors } = props;
+  console.log(props.colors);
   const colorsToShow = (colors ? colors : []);
 
   //Set values for the tier's overall styling
@@ -28,7 +30,7 @@ function Tier(props) {
         <h2 className="tier__title">{nameToShow}</h2>
       </div>
       <div className="tier__collection">
-        {(colorsToShow.map(color => <div>Hi</div>))}
+        {(colorsToShow.map(color => <Colorbox color={color} key={color._id}/>))}
       </div>
     </div>
   );

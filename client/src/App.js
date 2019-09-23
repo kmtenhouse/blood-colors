@@ -34,6 +34,17 @@ class App extends React.Component {
     axios.get(`${baseURL}/api/tiers`)
       .then(res => {
         const tiers = res.data;
+        tiers.forEach(tier=>{
+          if(tier.name==="gold") {
+            console.log("Adding Solluc");
+            tier.colors.push({
+              name: "pizza time",
+              hex: "#a1a100",
+              _id: "31337",
+              contrastingColor: "#000000"
+            });
+          }
+        });
         this.setState({ tiers });
       })
       .catch(err => console.log("Error:", err));
@@ -51,7 +62,7 @@ class App extends React.Component {
       <Container>
         <Spectrum title="Hemospectrum">
           {this.state.tiers.map(tier => (
-            <Tier key={tier._id} name={tier.name} displayColor={tier.displayColor} >
+            <Tier key={tier._id} name={tier.name} displayColor={tier.displayColor} colors={tier.colors} >
             </Tier>)
           )}
         </Spectrum>
