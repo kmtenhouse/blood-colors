@@ -1,17 +1,12 @@
 const fs = require('fs');
-const newFileName = 'hemospectrum-colors';
-const trollColors = require(`../../archive/data/${newFileName}`);
+const newFileName = 'allColors';
+const trollColors = require(`../../../archive/data/${newFileName}.json`);
+console.log(Array.isArray(trollColors));
 
 const objectArr = trollColors.map(troll => {
-    let rgbObj = hexToRGB(troll[0]);
     const obj = {
         name: troll[1],
-        hex: troll[0],
-        RGB: rgbObj,
-        YUV: RGBtoYUV(rgbObj),
-        caste: troll[1],
-        onSpec: true,
-        _id: createUUID()
+        hex: troll[0]
     }
     return obj;
 });
@@ -25,7 +20,7 @@ function writeJSON(filename, data) {
         console.log('The file has been saved!');
     });
 }
-
+/* 
 
 function hexToYUV(hex) {
     let rgbObj = hexToRGB(hex);
@@ -39,8 +34,6 @@ function RGBtoYUV(rgbObj) {
     const v = r * .500000 + g * -.418688 + b * -.081312 + 128;
     return { y, u, v };
 }
-
-
 
 function hexToRGB(hex) {
     if (hex.charAt(0) === "#") {
@@ -66,3 +59,4 @@ function createUUID() {
     });
     return uuid;
   }
+ */

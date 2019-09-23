@@ -7,11 +7,11 @@ const colorSvc = require("./color-service");
 module.exports = {
 
     findAll: function () {
-        return Tier.find({});
+        return Tier.find({}).sort([['order', 'ascending']]).populate("displayColor");
     },
 
     findOneById: function (tierId) {
-        return Tier.findById({ _id: tierId });
+        return Tier.findById({ _id: tierId }).populate("displayColor");
     },
 
     createOne: function (tierObj) {
@@ -29,10 +29,10 @@ module.exports = {
             //you may also optionally provide an integer to order the tiers 
             if(tierObj.order) {
                 console.log(tierObj.order);
-                if(Number.isNaN(parseInt(tierObj.order))) {
-                    reject(new Error("Order must be an integer!"));
+                if(Number.isNaN(parseFloat(tierObj.order))) {
+                    reject(new Error("Order must be a number!"));
                 }
-                tierObj.order = parseInt(tierObj.order);
+                tierObj.order = parseFloat(tierObj.order);
             } else {
                 tierObj.order = 0;
             }
