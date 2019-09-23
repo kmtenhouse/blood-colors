@@ -12,6 +12,8 @@ import './App.css';
 import Container from './components/Container';
 import Spectrum from './components/Spectrum';
 import Tier from './components/Tier';
+import Palette from './components/Palette';
+import Colorbox from './components/Colorbox';
 
 /* Import local data sources */
 const baseURL = "http://localhost:3001"
@@ -31,11 +33,12 @@ class App extends React.Component {
 
   componentDidMount() {
     //perform an axios call to get our tiers
+    //TO-DO: refactor
     axios.get(`${baseURL}/api/tiers`)
-      .then(res => {
+      .then(async res => {
         const tiers = res.data;
-        tiers.forEach(tier=>{
-          if(tier.name==="gold") {
+        tiers.forEach(tier => {
+          if (tier.name === "gold") {
             console.log("Adding Solluc");
             tier.colors.push({
               name: "pizza time",
@@ -45,7 +48,11 @@ class App extends React.Component {
             });
           }
         });
-        this.setState({ tiers });
+        //also get all colors
+        const allColors = await axios.get(`${baseURL}/api/colors`);
+        const colors = allColors.data;
+        
+        this.setState({ tiers, colors });
       })
       .catch(err => console.log("Error:", err));
   }
@@ -63,15 +70,18 @@ class App extends React.Component {
         <Spectrum title="Hemospectrum">
           {this.state.tiers.map(tier => (
             <Tier key={tier._id} name={tier.name} displayColor={tier.displayColor} colors={tier.colors} >
+
             </Tier>)
           )}
         </Spectrum>
 
-        <Spectrum title="Off Spectrum">
-          <Tier>
+        <Palette>
+          {this.state.colors.map(color => (
+            <Colorbox key={color._id} color={color} />
+          )
+          )}
+        </Palette>
 
-          </Tier>
-        </Spectrum>
       </Container>
     );
   }

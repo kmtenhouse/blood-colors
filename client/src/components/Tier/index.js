@@ -4,12 +4,13 @@ import Colorbox from '../Colorbox';
 
 
 function Tier(props) {
-  //Deconstruct the props
+  // Deconstruct the props
   const { displayColor, name, colors } = props;
-  console.log(props.colors);
+  
+  // Make sure we have something to iterate (even if it's empty)
   const colorsToShow = (colors ? colors : []);
 
-  //Set values for the tier's overall styling
+  // Next, set values for the tier's overall styling
   const hex = ((displayColor && displayColor.hasOwnProperty('hex')) ? displayColor.hex : "#000000");
   const contrastColor = ((displayColor && displayColor.hasOwnProperty('contrastColor')) ? displayColor.contrastColor : "#FFFFFF");
 

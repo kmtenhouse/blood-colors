@@ -1,14 +1,5 @@
-.tier {
+.palette {
     width: 100%;
-}
-
-.tier__title {
-    padding: 0.5em;
-    margin: 0;
-    font-size: 1.5em;
-}
-
-.tier__collection {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
