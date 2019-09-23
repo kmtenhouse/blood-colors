@@ -11,6 +11,15 @@ module.exports = {
             .then(results => res.json(results))
             .catch(err => res.status(500).json({ error: err.message }));
     },
+    updateOneById: function(req, res) {
+        //Check that we're trying to update the same item that we are hitting via the route -- don't want any mismatches!
+        if(req.body._id!==req.params.id) {
+            return res.status(400).json({ error: "Id mismatch!"})
+        }
+        Color.updateOneById(req.body) 
+            .then(result=>res.json(result))
+            .catch(err=>res.status(500).json({error: err.message}))
+    },
     create: function (req, res) {
         Color.createOne(req.body)
             .then(result => res.json(result))

@@ -48,6 +48,29 @@ module.exports = {
 
     },
 
+    updateOneById: function (updateObj) {
+        return new Promise(async (resolve, reject) => {
+            //check if we're receiving a valid mongo id
+            try {
+                if (!updateObj._id || /^[0-9a-fA-F]{24}$/.test(updateObj._id) === false) {
+                    reject(new Error("Must provide a valid id to update!"));
+                }
+
+                //the only things we can update right now are the name
+                if (!updateObj.name || typeof updateObj.name !== "string") {
+                    reject(new Error("Must provide a string for the new name!"));
+                }
+
+                let colorToUpdate = await Color.findOneAndUpdate(updateObj._id, { name: updateObj.name }, {new: true});
+                resolve(colorToUpdate);
+            }
+            catch (err) {
+                reject(err);
+            }
+        })
+
+    },
+
     deleteOne: function (id) {
         return new Promise((resolve, reject) => {
             //check if we're receiving a valid mongo id
