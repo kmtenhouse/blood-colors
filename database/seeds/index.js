@@ -12,33 +12,32 @@ seeder.connect('mongodb://localhost/bloodcolorsdev',
     useNewUrlParser: true,
   },
   function () {
-
     try {
       // Load all available Mongoose models
       seeder.loadModels([
-        'database/schema/'
+        'database/schema/color.js',
+        'database/schema/tier.js'
       ]);
 
-      //figure out which collections we are clearing
-      const modelsToClear = [];
-      for (seed of allSeeds) {
-        modelsToClear.push(seed.model);
-      }
-
       // Clear specified collections
-      seeder.clearModels(modelsToClear, function () {
-
-        // Callback to populate DB once collections have been cleared
-        seeder.populateModels(allSeeds, function () {
+      seeder.clearModels(['Color', 'Tier'], function () {
+        try {
+          // Callback to populate DB once collections have been cleared
+          seeder.populateModels(allSeeds, function () {
+            seeder.disconnect();
+          });
+        }
+        catch(e) {
+          console.log(e);
           seeder.disconnect();
-        });
+        }
 
       });
     }
-    catch(err) {
+    catch (err) {
       console.log(err);
       seeder.disconnect();
     }
-  
+
   });
 

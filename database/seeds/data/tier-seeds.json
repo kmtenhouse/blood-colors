@@ -1,0 +1,9 @@
+{
+    "model": "Tier",
+    "documents": [
+        {
+            "name": "Gold",
+            "hex": "a1a100"
+        }
+    ]
+}

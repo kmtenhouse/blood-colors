@@ -1,5 +1,7 @@
 const Color = require ("./color");
+const Tier = require ("./tier");
 
 module.exports = {
-    Color: Color
+    Color: Color,
+    Tier: Tier
 }
