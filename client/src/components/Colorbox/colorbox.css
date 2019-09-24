@@ -37,6 +37,7 @@
 }
 
 .colorbox__select {
+    width: 100%;
     background-color: inherit;
     color: inherit;
     text-align: center;
@@ -45,8 +46,7 @@
 }
 
 .colorbox__option {
-    background-color: white;
-    color: black
+   padding: 0.25em;
 }
 
  .colorbox__label {

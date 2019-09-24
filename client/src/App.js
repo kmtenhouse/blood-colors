@@ -49,10 +49,10 @@ class App extends React.Component {
           }
         });
         //also get all colors
-        const allColors = await axios.get(`${baseURL}/api/colors`);
-        const colors = allColors.data;
+        /* const allColors = await axios.get(`${baseURL}/api/colors`);
+        const colors = allColors.data; */
 
-        this.setState({ tiers, colors });
+        this.setState({ tiers });
       })
       .catch(err => console.log("Error:", err));
   }
