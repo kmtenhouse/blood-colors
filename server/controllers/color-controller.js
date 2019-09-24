@@ -4,12 +4,10 @@ const utils = require("../services/utils/hex-conversion");
 module.exports = {
     findOneById: async function (req, res) {
         try {
-            const checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-            if (!checkForHexRegExp.test(req.params.id)) {
-                return res.sendStatus(400);
-            }
-
             const result = await Color.findById({ _id: req.params.id });
+            if(!result) {
+                return res.sendStatus(404);
+            }
             res.status(200).json(result);
         }
         catch (err) {
@@ -28,12 +26,7 @@ module.exports = {
     updateOneById: async function (req, res) { //req.body._id && req.params.id
         try {
             //Immediate rejections:
-            //1) If an invalid id was provided
-            if (!req.body._id || /^[0-9a-fA-F]{24}$/.test(req.body._id) === false) {
-                return res.status(400).json({ error: "Must provide a valid id to update!" });
-            }
-
-            //2) If the id in the payload doesn't match the id in the url
+            //1) If the id in the payload doesn't match the id in the url
             if (req.body._id !== req.params.id) {
                 return res.status(400).json({ error: "Mismatch between URI and id in body!" });
             }
@@ -43,7 +36,7 @@ module.exports = {
 
             //Now, make sure the item exists before we try updating!
             if(!colorToUpdate) {
-                return res.status(404).json({ error: "Color not found!"});
+                return res.sendStatus(404);
             }
 
             //Allowable properties to update:
@@ -100,11 +93,6 @@ module.exports = {
     },
     delete: async function (req, res) {
         try {
-            const checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-            if (!checkForHexRegExp.test(req.params.id)) {
-                return res.sendStatus(400);
-            }
-
             const deleteAttempt = await Color.deleteOne({ _id: req.params.id });
             if (!deleteAttempt || deleteAttempt.deletedCount === 0) {
                 return res.sendStatus(404);
