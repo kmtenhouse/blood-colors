@@ -29,15 +29,13 @@ class App extends React.Component {
       tiers: [],
       colors: []
     };
+
+    this.moveTiers = this.moveTiers.bind(this);
   }
 
   async componentDidMount() {
     //perform an axios call to get our tiers
-    const allTiers = await axios.get(`${baseURL}/api/tiers`);
-    const tiers = allTiers.data;
-    const allColors = await axios.get(`${baseURL}/api/colors`);
-    const colors = allColors.data.filter(color=> color.tier);
-    this.setState({ colors, tiers });
+    this.refreshColors();
   }
 
   /*   Form Handling */
@@ -47,20 +45,38 @@ class App extends React.Component {
     this.setState({ [name]: value });
   }
 
-  async moveTiers(color, tierId) {
-    console.log(color.name);
-    console.log(tierId);
+  async refreshColors() {
+    const allTiers = await axios.get(`${baseURL}/api/tiers`);
+    const tiers = allTiers.data;
+    const allColors = await axios.get(`${baseURL}/api/colors`);
+    const colors = allColors.data;
+    this.setState({ colors, tiers });
+  }
 
-    //First, if the color is going off spectrum:
-    //Remove it from its current tier (if any)
-    //Move it to the generic colors area
+  async moveTiers(colorToUpdate, newTierId) {
+    console.log(colorToUpdate, newTierId);
+    let newColors = this.state.colors;
+    //First, remove the color from its existing tier (if it has one):
+    if (colorToUpdate.tier && colorToUpdate.tier!=="-1") {
+      //axios call to delete from old tier
+      await axios.delete(`${baseURL}/api/tiers/${colorToUpdate.tier}/colors/${colorToUpdate._id}`);
+    } else {
+      //Prepare to update the local state as well
+      newColors = this.state.colors.filter(currColor => currColor._id !== colorToUpdate._id);
+    }
 
-    //Otherwise, if it is going from tier A to tier B
-    //Remove it from its current tier 
-    //Replace that with tier B
+    //If the new tier is not off spectrum, set that as well:
+    if (newTierId !== "-1") {
+      await axios.post(`${baseURL}/api/tiers/${newTierId}/colors/${colorToUpdate._id}`);
+    } else {
+      newColors = this.state.colors;
+      newColors.push(colorToUpdate);
+    }
 
-    //Off-spectrum -> Tier A
-    //Add it to Tier A
+    //Now update the local state to match the remote db!
+    const allTiers = await axios.get(`${baseURL}/api/tiers`);
+    const tiers = allTiers.data;
+    this.setState({ colors: newColors, tiers });
   }
 
   render() {
@@ -72,7 +88,11 @@ class App extends React.Component {
               name={currentTier.name}
               displayColor={currentTier.displayColor}
               colors={currentTier.colors}
-              key={currentTier._id}>
+              key={currentTier._id}
+              dropDownChange={this.moveTiers}>
+              {currentTier.colors.map(currentColor => (
+                <Colorbox color={currentColor} tiers={this.state.tiers} dropDownChange={this.moveTiers} key={currentColor._id} />
+              ))}
             </Tier>))}
         </Spectrum>
         <Spectrum title="Off Spectrum">

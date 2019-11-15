@@ -24,10 +24,11 @@ function Colorbox(props) {
           <li className="colorbox__label">
             <select style={selectStyle} onChange={(event)=>{
               event.preventDefault();
-              if(props.dropDownChange) {
+              if(props.dropDownChange && event.target.value!==-2) {
                 props.dropDownChange(props.color, event.target.value);
               }
             }}>
+              <option value="-2">Select:</option>
               <option value="-1">Off Spectrum</option>
               {tiers.map(currentTier => (<option key={_id + currentTier._id} value={currentTier._id}>{currentTier.name}</option>) )}
             </select>

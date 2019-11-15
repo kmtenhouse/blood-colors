@@ -17,7 +17,7 @@ module.exports = {
             }
 
             //If we did correctly update the tier, update the color as well!
-            colorToAdd.tier = result._id;
+            colorToAdd.tier = req.params.id;
             await colorToAdd.save();
 
             res.sendStatus(204);
@@ -42,7 +42,7 @@ module.exports = {
             //attempt to look up the color
             let colorToUpdate = await Color.findById(req.params.colorid);
             if(colorToUpdate) {
-                colorToUpdate.tier="";
+                colorToUpdate.tier = undefined;
                 await colorToUpdate.save();
             }
 

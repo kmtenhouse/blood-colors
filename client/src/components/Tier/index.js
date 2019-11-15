@@ -6,7 +6,7 @@ import Colorbox from '../Colorbox';
 function Tier(props) {
   // Deconstruct the props
   const { displayColor, name, colors } = props;
-  
+
   // Make sure we have something to iterate (even if it's empty)
   const colorsToShow = (colors ? colors : []);
 
@@ -31,7 +31,8 @@ function Tier(props) {
         <h2 className="tier__title">{nameToShow}</h2>
       </div>
       <div className="tier__collection">
-        {(colorsToShow.map(color => <Colorbox color={color} key={color._id}/>))}
+        {props.children}
+       {/*  {(colorsToShow.map(color => <Colorbox color={color} key={color._id}/>))} */}
       </div>
     </div>
   );
