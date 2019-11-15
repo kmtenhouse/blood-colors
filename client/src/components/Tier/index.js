@@ -1,14 +1,9 @@
 import React from 'react';
 import './tier.css';
-import Colorbox from '../Colorbox';
-
 
 function Tier(props) {
   // Deconstruct the props
-  const { displayColor, name, colors } = props;
-
-  // Make sure we have something to iterate (even if it's empty)
-  const colorsToShow = (colors ? colors : []);
+  const { displayColor, name} = props;
 
   // Next, set values for the tier's overall styling
   const hex = ((displayColor && displayColor.hasOwnProperty('hex')) ? displayColor.hex : "#000000");
@@ -32,7 +27,6 @@ function Tier(props) {
       </div>
       <div className="tier__collection">
         {props.children}
-       {/*  {(colorsToShow.map(color => <Colorbox color={color} key={color._id}/>))} */}
       </div>
     </div>
   );

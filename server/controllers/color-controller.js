@@ -16,6 +16,15 @@ module.exports = {
     },
     findAll: async function (req, res) {
         try {
+            const results = await Color.find({ });
+            res.status(200).json(results);
+        }
+        catch (err) {
+            res.sendStatus(500);
+        }
+    },
+    findColorsWithNoTier: async function(req, res) {
+        try {
             const results = await Color.find({ tier: { $exists: false } });
             res.status(200).json(results);
         }

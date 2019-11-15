@@ -1,111 +1,57 @@
 /* Import React */
 import React from 'react';
 
-/* Import Axios for requests */
-import axios from 'axios';
-
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 /* Import CSS (for App) */
 import './App.css';
 
-/* Import components */
-import Container from './components/Container';
-import Spectrum from './components/Spectrum';
-import Tier from './components/Tier';
-import Palette from './components/Palette';
-import Colorbox from './components/Colorbox';
+/* Import pages */
+import ColorSort from './pages/colorSort';
+import Home from "./pages/home";
 
-/* Import local data sources */
-const baseURL = "http://localhost:3001"
+export default function App() {
+  return (
+    <Router>
+      <div>
+        <nav className="nav">
+          <ul className="nav__bar">
+            <li className="nav__item">
+              <Link to="/">Home</Link>
+            </li>
+            <li className="nav__item">
+              <Link to="/train">Train</Link>
+            </li>
+            <li className="nav__item">
+              <Link to="/sort">Sort Data</Link>
+            </li>
+          </ul>
+        </nav>
 
-class App extends React.Component {
-
-  constructor(props) {
-    super(props);
-    //bindings!
-    this.handleChange = this.handleChange.bind(this);
-
-    this.state = {
-      tiers: [],
-      colors: []
-    };
-
-    this.moveTiers = this.moveTiers.bind(this);
-  }
-
-  async componentDidMount() {
-    //perform an axios call to get our tiers
-    this.refreshColors();
-  }
-
-  /*   Form Handling */
-  handleChange(e) {
-    e.preventDefault();
-    let { name, value } = e.target;
-    this.setState({ [name]: value });
-  }
-
-  async refreshColors() {
-    const allTiers = await axios.get(`${baseURL}/api/tiers`);
-    const tiers = allTiers.data;
-    const allColors = await axios.get(`${baseURL}/api/colors`);
-    const colors = allColors.data;
-    this.setState({ colors, tiers });
-  }
-
-  async moveTiers(colorToUpdate, newTierId) {
-    console.log(colorToUpdate, newTierId);
-    let newColors = this.state.colors;
-    //First, remove the color from its existing tier (if it has one):
-    if (colorToUpdate.tier && colorToUpdate.tier!=="-1") {
-      //axios call to delete from old tier
-      await axios.delete(`${baseURL}/api/tiers/${colorToUpdate.tier}/colors/${colorToUpdate._id}`);
-    } else {
-      //Prepare to update the local state as well
-      newColors = this.state.colors.filter(currColor => currColor._id !== colorToUpdate._id);
-    }
-
-    //If the new tier is not off spectrum, set that as well:
-    if (newTierId !== "-1") {
-      await axios.post(`${baseURL}/api/tiers/${newTierId}/colors/${colorToUpdate._id}`);
-    } else {
-      newColors = this.state.colors;
-      newColors.push(colorToUpdate);
-    }
-
-    //Now update the local state to match the remote db!
-    const allTiers = await axios.get(`${baseURL}/api/tiers`);
-    const tiers = allTiers.data;
-    this.setState({ colors: newColors, tiers });
-  }
-
-  render() {
-    return (
-      <Container>
-        <Spectrum title="Hemospectrum">
-          {this.state.tiers.map(currentTier => (
-            <Tier
-              name={currentTier.name}
-              displayColor={currentTier.displayColor}
-              colors={currentTier.colors}
-              key={currentTier._id}
-              dropDownChange={this.moveTiers}>
-              {currentTier.colors.map(currentColor => (
-                <Colorbox color={currentColor} tiers={this.state.tiers} dropDownChange={this.moveTiers} key={currentColor._id} />
-              ))}
-            </Tier>))}
-        </Spectrum>
-        <Spectrum title="Off Spectrum">
-          <Palette>
-            {this.state.colors.map(currentColor => (
-              <Colorbox color={currentColor} tiers={this.state.tiers} dropDownChange={this.moveTiers} key={currentColor._id} />
-            ))}
-          </Palette>
-        </Spectrum>
-      </Container>
-    );
-  }
+        {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+        <Switch>
+          <Route exact path="/train">
+            <Train />
+          </Route>
+          <Route exact path="/sort">
+            <ColorSort />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
 }
 
+function Train() {
+  return <h2>Train</h2>;
+}
 
-export default App;

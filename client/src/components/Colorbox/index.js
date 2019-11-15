@@ -4,7 +4,8 @@ import './colorbox.css';
 
 function Colorbox(props) {
   const { _id, name, hex, contrastColor } = props.color;
-  const tiers = (props.tiers ? props.tiers : [])
+  const tiers = (props.tiers ? props.tiers : []);
+  const showLock = (props.onLock ? true : false);
 
   let style = {
     backgroundColor: hex,
@@ -20,7 +21,8 @@ function Colorbox(props) {
       <ul className="colorbox__info">
         <li className="colorbox__label">{(name ? name : '')}</li>
         <li className="colorbox__label"> {hex}</li>
-        {tiers.length > 0 ? (
+        {(showLock ? ( <li onClick={(event)=> { event.preventDefault(); props.onLock(props.color);}} className="colorbox__label"><i className="material-icons" style={style}>{(props.color.tier && props.color.tier!==-1 ? 'lock' : 'lock_open')}</i></li>) : '')}
+        {props.dropDownChange && tiers.length > 0 ? (
           <li className="colorbox__label">
             <select style={selectStyle} onChange={(event)=>{
               event.preventDefault();
@@ -29,7 +31,7 @@ function Colorbox(props) {
               }
             }}>
               <option value="-2">Select:</option>
-              <option value="-1">Off Spectrum</option>
+              <option value="-1">Pallete</option>
               {tiers.map(currentTier => (<option key={_id + currentTier._id} value={currentTier._id}>{currentTier.name}</option>) )}
             </select>
           </li>) : ''}
