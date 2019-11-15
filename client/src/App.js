@@ -31,30 +31,13 @@ class App extends React.Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     //perform an axios call to get our tiers
-    //TO-DO: refactor
-    axios.get(`${baseURL}/api/tiers`)
-      .then(async res => {
-        const tiers = res.data;
-        tiers.forEach(tier => {
-          if (tier.name === "gold") {
-            console.log("Adding Solluc");
-            tier.colors.push({
-              name: "pizza time",
-              hex: "#a1a100",
-              _id: "31337",
-              contrastingColor: "#000000"
-            });
-          }
-        });
-        //also get all colors
-        /* const allColors = await axios.get(`${baseURL}/api/colors`);
-        const colors = allColors.data; */
-
-        this.setState({ tiers });
-      })
-      .catch(err => console.log("Error:", err));
+    const allTiers = await axios.get(`${baseURL}/api/tiers`);
+    const tiers = allTiers.data;
+    const allColors = await axios.get(`${baseURL}/api/colors`);
+    const colors = allColors.data.filter(color=> color.tier);
+    this.setState({ colors, tiers });
   }
 
   /*   Form Handling */
@@ -64,23 +47,39 @@ class App extends React.Component {
     this.setState({ [name]: value });
   }
 
+  async moveTiers(color, tierId) {
+    console.log(color.name);
+    console.log(tierId);
+
+    //First, if the color is going off spectrum:
+    //Remove it from its current tier (if any)
+    //Move it to the generic colors area
+
+    //Otherwise, if it is going from tier A to tier B
+    //Remove it from its current tier 
+    //Replace that with tier B
+
+    //Off-spectrum -> Tier A
+    //Add it to Tier A
+  }
+
   render() {
     return (
       <Container>
         <Spectrum title="Hemospectrum">
-          {this.state.tiers.map(tier => (
-            <Tier key={tier._id} name={tier.name} displayColor={tier.displayColor} colors={tier.colors} >
-
-            </Tier>)
-          )}
+          {this.state.tiers.map(currentTier => (
+            <Tier
+              name={currentTier.name}
+              displayColor={currentTier.displayColor}
+              colors={currentTier.colors}
+              key={currentTier._id}>
+            </Tier>))}
         </Spectrum>
-
         <Spectrum title="Off Spectrum">
           <Palette>
-            {this.state.colors.map(color => (
-              <Colorbox key={color._id} color={color} />
-            )
-            )}
+            {this.state.colors.map(currentColor => (
+              <Colorbox color={currentColor} tiers={this.state.tiers} dropDownChange={this.moveTiers} key={currentColor._id} />
+            ))}
           </Palette>
         </Spectrum>
       </Container>

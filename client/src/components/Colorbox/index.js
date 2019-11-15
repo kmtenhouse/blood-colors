@@ -3,16 +3,16 @@ import './colorbox.css';
 
 
 function Colorbox(props) {
-  const { name, hex, contrastingColor } = props.color;
+  const { _id, name, hex, contrastColor } = props.color;
   const tiers = (props.tiers ? props.tiers : [])
 
   let style = {
     backgroundColor: hex,
-    color: contrastingColor
+    color: contrastColor
   };
 
   let selectStyle = {
-    borderColor: contrastingColor
+    borderColor: contrastColor
   };
 
   return (
@@ -22,8 +22,14 @@ function Colorbox(props) {
         <li className="colorbox__label"> {hex}</li>
         {tiers.length > 0 ? (
           <li className="colorbox__label">
-            <select className="colorbox__select" style={selectStyle}>
-              <option value={tiers._id}>{tiers.name}</option>
+            <select style={selectStyle} onChange={(event)=>{
+              event.preventDefault();
+              if(props.dropDownChange) {
+                props.dropDownChange(props.color, event.target.value);
+              }
+            }}>
+              <option value="-1">Off Spectrum</option>
+              {tiers.map(currentTier => (<option key={_id + currentTier._id} value={currentTier._id}>{currentTier.name}</option>) )}
             </select>
           </li>) : ''}
       </ul>

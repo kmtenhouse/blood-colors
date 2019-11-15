@@ -1,4 +1,5 @@
 const Color = require("../../database/schema/color");
+const Tier = require("../../database/schema/tier");
 const utils = require("../services/utils/hex-conversion");
 
 module.exports = {
@@ -47,11 +48,24 @@ module.exports = {
                 return res.status(400).json({ error: "Must provide a string for the new name!" });
             }
 
+            //TIER
+    /*         if(req.body.tier && /^#?[0-9a-fA-F]{6}$/.test(req.body.tier) === true) {
+                console.log(req.body.tier);
+                let tierToAdd = await Tier.findById(req.body.tier);
+                console.log(tierToAdd);
+                if(!tierToAdd) {
+                    return res.status(400).json({ error: "Must provide a valid tier for the color!" })
+                }
+                //update the color's record for its tier
+                colorToUpdate.tier = tierToAdd;
+            } */
+
             //Finally, save the updated color:
             await colorToUpdate.save();
             res.status(200).json(colorToUpdate);
         }
         catch (err) {
+            console.log(err.message);
             res.sendStatus(500);
         }
     },
