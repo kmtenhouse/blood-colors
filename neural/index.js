@@ -12,9 +12,9 @@ const tierList = tiers.map(tier => ({ name: tier.name, _id: tier._id }));
 //create a simple feed forward neural network with backpropagation
 const net = new brain.NeuralNetwork({
   activation: 'sigmoid', // activation function
-  hiddenLayers: [6, 6],
+  hiddenLayers: [9],
   iterations: 20000,
-  learningRate: 0.5 // global learning rate, useful when training using streams
+  learningRate: 0.6 // global learning rate, useful when training using streams
 });
 
 net.train(trainData);
