@@ -26,17 +26,18 @@ colors.forEach(color => {
         input: [h, s, v],
         output: result
     };
-    if (alternate[hit]) {
+    if (alternate[hit]===3) {
         testSet.push(dataObj);
         alternate[hit] = 0;
     }
     else {
         trainingSet.push(dataObj);
-        alternate[hit] = 1;
+        alternate[hit] += 1;
     }
 });
 
-fs.writeFile('trainingSet.json', JSON.stringify(trainingSet), (err) => {
+
+ fs.writeFile('trainingSet.json', JSON.stringify(trainingSet), (err) => {
     if (err) throw err;
     console.log('Training set saved!');
 });
@@ -44,7 +45,7 @@ fs.writeFile('trainingSet.json', JSON.stringify(trainingSet), (err) => {
 fs.writeFile('testSet.json', JSON.stringify(testSet), (err) => {
     if (err) throw err;
     console.log('Test set saved!');
-});
+});  
 
 
 //helper functions
