@@ -17,5 +17,7 @@ router.delete("/:id", tiersController.delete);
 router.post("/:id/colors/:colorid", colorsController.addOneColor)
 router.delete("/:id/colors/:colorid", colorsController.removeOneColor);
 
+//filters
+router.get("/filter/withcolors", tiersController.findAllWithColors);
 
 module.exports = router;

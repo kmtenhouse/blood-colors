@@ -22,10 +22,10 @@ export default function App() {
         <nav className="nav">
           <ul className="nav__bar">
             <li className="nav__item">
-              <Link to="/">Home</Link>
+              <Link to="/">Train</Link>
             </li>
             <li className="nav__item">
-              <Link to="/train">Train</Link>
+              <Link to="/home">View Current</Link>
             </li>
             <li className="nav__item">
               <Link to="/sort">Sort Data</Link>
@@ -36,14 +36,14 @@ export default function App() {
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
         <Switch>
-          <Route exact path="/train">
-            <Train />
+          <Route exact path="/home">
+            <Home />
           </Route>
           <Route exact path="/sort">
             <ColorSort />
           </Route>
           <Route path="/">
-            <Home />
+            <Train />
           </Route>
         </Switch>
       </div>

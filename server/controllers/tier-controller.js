@@ -13,6 +13,15 @@ module.exports = {
     },
     findAll: async function (req, res) {
         try {
+            const results = await Tier.find({}).sort([['order', 'ascending']]).populate("displayColor");
+            return res.status(200).json(results);
+
+        } catch (err) {
+            return res.sendStatus(500);
+        }
+    },
+    findAllWithColors: async function (req, res) {
+        try {
             const results = await Tier.find({}).sort([['order', 'ascending']]).populate("displayColor").populate("colors");
             return res.status(200).json(results);
 

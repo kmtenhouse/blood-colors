@@ -32,6 +32,15 @@ module.exports = {
             res.sendStatus(500);
         }
     },
+    findColorsWithTier: async function(req, res) {
+        try {
+            const results = await Color.find({ tier: { $exists: true } });
+            res.status(200).json(results);
+        }
+        catch (err) {
+            res.sendStatus(500);
+        }
+    },
     updateOneById: async function (req, res) { //req.body._id && req.params.id
         try {
             //Immediate rejections:

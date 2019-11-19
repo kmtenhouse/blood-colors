@@ -15,6 +15,7 @@ router.put("/:id", colorsController.updateOneById);
 router.delete("/:id", colorsController.delete);
 
 //Filter
+router.get("/filter/withtier", colorsController.findColorsWithTier);
 router.get("/filter/notier", colorsController.findColorsWithNoTier);
 
 module.exports = router;

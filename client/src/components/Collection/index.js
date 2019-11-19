@@ -6,6 +6,7 @@ function Collection(props) {
     if(!props.colors || props.colors.length===0) {
         return(
             <div>
+                <p>Loading...</p>
             </div>
         );
     } 

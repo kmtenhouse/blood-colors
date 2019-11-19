@@ -44,7 +44,7 @@ class ColorSort extends React.Component {
   }
 
   async refreshColors() {
-    const allTiers = await axios.get(`${baseURL}/api/tiers`);
+    const allTiers = await axios.get(`${baseURL}/api/tiers/filter/withcolors`);
     const tiers = allTiers.data;
     const allColors = await axios.get(`${baseURL}/api/colors/filter/notier`);
     let colors = allColors.data;
