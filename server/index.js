@@ -17,7 +17,7 @@ module.exports = function() {
     server.set("env", config.env);
     server.set("port", config.port);
     server.set("hostname", config.hostname);
-    //server.set("staticDir", config.staticDir);
+    server.set("staticDir", config.staticDir);
     
     // Returns middleware that parses json
     server.use(
@@ -28,7 +28,7 @@ module.exports = function() {
     server.use(bodyParser.json());
 
     //Set up static files
-    //server.use(express.static(server.get("staticDir")));
+    server.use(express.static(server.get("staticDir")));
 
     //Logging (for dev)
     server.use(morgan("dev"));

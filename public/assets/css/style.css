@@ -1,0 +1,135 @@
+body {
+    background-image: url("/assets/images/what-the-hex-dark.png");
+    background-repeat: repeat;  
+    background-color: white;
+    color: white;
+    line-height: 1;
+}
+
+.container {
+    margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+.tier {
+    width: 100%;
+    margin-bottom: 2em;
+}
+
+.tier__title {
+    padding: 0.5em;
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.tier__collection {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.colorbox {
+    height: 119px;
+    width: 119px;
+    border: 1px solid black;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+ .colorbox:hover {
+    transform: scale(1.75);
+    transition: all 0.3s ease-in-out;
+    z-index: 1;
+}
+
+.colorbox:hover .colorbox__select {
+    display: block;
+}
+
+.colorbox__info {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.colorbox__button {
+    border: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    cursor: pointer;
+}
+
+.colorbox__select {
+    width: 100%;
+    background-color: inherit;
+    color: inherit;
+    text-align: center;
+    display: none;
+    cursor: pointer;
+}
+
+.colorbox__select:focus {
+    color: black;
+}
+
+.colorbox__option {
+   padding: 0.25em;
+}
+
+ .colorbox__label {
+     margin: 0.1em;
+ }
+
+ /* DEFAULT: Extra small devices (portrait phones, less than 576px) */
+.spectrum {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.spectrum__title {
+    margin: 0;
+    padding: 0.5em;
+    font-size: 1.75em;
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) { 
+    .spectrum {
+        width: 500px;
+        margin: 2em auto;
+    }    
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) { 
+    .spectrum {
+        width: 700px;
+    } 
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) { 
+    .spectrum {
+        width: 900px;
+    } 
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { 
+    .spectrum {
+        width: 1240px;
+    } 
+}
