@@ -3,48 +3,53 @@
 const express = require("express"),
   bodyParser = require("body-parser"),
   morgan = require("morgan"),
-  cors = require("cors");
+  cors = require("cors"),
+  exphbs = require("express-handlebars");
 
-module.exports = function() {
-  let server = express(),
+module.exports = function () {
+  let app = express(),
     create,
     start;
 
-  create = function(config) {
+  create = function (config) {
     let routes = require("./routes");
-    
+
     // Server settings
-    server.set("env", config.env);
-    server.set("port", config.port);
-    server.set("hostname", config.hostname);
-    server.set("staticDir", config.staticDir);
-    
+    app.set("env", config.env);
+    app.set("port", config.port);
+    app.set("hostname", config.hostname);
+    app.set("staticDir", config.staticDir);
+
     // Returns middleware that parses json
-    server.use(
+    app.use(
       bodyParser.urlencoded({
         extended: false
       })
     );
-    server.use(bodyParser.json());
+    app.use(bodyParser.json());
 
     //Set up static files
-    server.use(express.static(server.get("staticDir")));
+    app.use(express.static(app.get("staticDir")));
+
+    //Set our view engine as handlebars, and the default layout as main
+    app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+    app.set("view engine", "handlebars");
 
     //Logging (for dev)
-    server.use(morgan("dev"));
+    app.use(morgan("dev"));
 
     // Set up CORS here
-    server.use(cors());
+    app.use(cors());
     // Set up routes
     // ====== Routing ======
-    server.use(routes);
+    app.use(routes);
   };
 
-  start = function() {
-    let hostname = server.get("hostname"),
-      port = server.get("port");
+  start = function () {
+    let hostname = app.get("hostname"),
+      port = app.get("port");
 
-    server.listen(port, function() {
+    app.listen(port, function () {
       console.log(`App listening on http://${hostname}:${port}`);
     });
   };

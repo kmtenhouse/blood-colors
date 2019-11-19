@@ -1,4 +1,31 @@
 <div class="container">
-    <div class="spectrum" id="spectrum"></div>
+    <div class="spectrum" id="spectrum">
+        {{#each tiers}}
+        <div class="tier">
+            <div class="tier__header"
+                style="background-color:{{this.displayColor.hex}};color:{{this.displayColor.contrastColor}}"">
+        <h2 class=" tier__title">{{this.name}}</h2>
+            </div>
+            <div class="tier__collection">
+                {{#each this.colors}}
+                <div class="colorbox" style="background-color:{{hex}};color:{{contrastColor}}">
+                    <ul class="colorbox__info">
+                        <li class="colorbox__label">{{name}}</li>
+                        <li class="colorbox__label">{{hex}}</li>
+                        <li class="colorbox__label">
+                            <select class="colorbox__select">
+                                {{#each tiers}} 
+                                <option>{{this.name}}</option>
+                                {{/each}}
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                {{/each}}
+            </div>
+            <div class="tier__suggested"></div>
+        </div>
+        {{/each}}
+    </div>
     <div id="unsorted"></div>
 </div>

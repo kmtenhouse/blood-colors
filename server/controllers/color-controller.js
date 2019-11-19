@@ -1,13 +1,9 @@
-const Color = require("../../database/schema/color");
-const utils = require("../services/utils/hex-conversion");
+const ColorSvc = require("../services/color-service");
 
 module.exports = {
     findOneById: async function (req, res) {
         try {
-            const result = await Color.findById({ _id: req.params.id });
-            if(!result) {
-                return res.sendStatus(404);
-            }
+            const result = await ColorSvc.findOneById(req.params.id);
             res.status(200).json(result);
         }
         catch (err) {
@@ -16,25 +12,25 @@ module.exports = {
     },
     findAll: async function (req, res) {
         try {
-            const results = await Color.find({ });
+            const results = await ColorSvc.findAll();
             res.status(200).json(results);
         }
         catch (err) {
             res.sendStatus(500);
         }
     },
-    findColorsWithNoTier: async function(req, res) {
+    findColorsWithNoTier: async function (req, res) {
         try {
-            const results = await Color.find({ tier: { $exists: false } });
+            const results = await ColorSvc.findColorsWithNoTier();
             res.status(200).json(results);
         }
         catch (err) {
             res.sendStatus(500);
         }
     },
-    findColorsWithTier: async function(req, res) {
+    findColorsWithTier: async function (req, res) {
         try {
-            const results = await Color.find({ tier: { $exists: true } });
+            const results = await ColorSvc.findColorsWithTier();
             res.status(200).json(results);
         }
         catch (err) {
@@ -50,78 +46,32 @@ module.exports = {
             }
 
             //Next, find the item we are updating:
-            let colorToUpdate = await Color.findById(req.body._id);
-
-            //Now, make sure the item exists before we try updating!
-            if(!colorToUpdate) {
-                return res.sendStatus(404);
-            }
-
-            //Allowable properties to update:
-            //NAME 
-            if (req.body.name === "" || typeof req.body.name === "string") {
-                colorToUpdate.name = req.body.name;
-            } else if (req.body.name && typeof req.body.name !== "string") {
-                return res.status(400).json({ error: "Must provide a string for the new name!" });
-            }
-
-            //Finally, save the updated color:
-            await colorToUpdate.save();
+            let colorToUpdate = await ColorSvc.updateOne(req.body);
             res.status(200).json(colorToUpdate);
         }
         catch (err) {
             console.log(err.message);
-            res.sendStatus(500);
+            res.sendStatus(err.statusCode || 500);
         }
     },
     create: async function (req, res) { //req.body
         try {
-            //Immediate rejections:
-            //1) User does not provide at least a hex (#000000 or 000000 format) for the color
-            if (!req.body || !req.body.hex || /^#?[0-9a-fA-F]{6}$/.test(req.body.hex) === false) {
-                return res.status(400).json({ error: "Must provide valid hex value for the color! (six digit version)" });
-            }
-
-            //if we got to this stage, congrats, we have a valid hex! 
-            //add the # to the hex if it's missing
-            const hex = (/^#{1}/.test(req.body.hex) ? req.body.hex : "#" + req.body.hex);
-
-            //calculate a reasonable contrast color
-            const contrastColor = "#" + utils.getContrastColor(hex);
-
-            //Create a new color
-            const newColor = new Color({ hex, contrastColor });
-
-            //OPTIONAL ITEMS
-            //You may optionally provide a name, but that must be a string
-            if (req.body.name) {
-                if (typeof req.body.name !== "string") {
-                    return res.status(400).json({ error: "Must provide valid name for the color!" });
-                }
-                newColor.name = req.body.name;
-            }
-
-            //Finally, save the document to the db and return the results
-            const result = await newColor.save();
+            const result = await ColorSvc.create(req.body);
             res.status(200).json(result);
         }
         catch (err) {
-            console.log(err);
-            res.sendStatus(500);
+            console.log(err.message);
+            res.sendStatus(err.statusCode || 500);
         }
     },
     delete: async function (req, res) {
         try {
-            const deleteAttempt = await Color.deleteOne({ _id: req.params.id });
-            if (!deleteAttempt || deleteAttempt.deletedCount === 0) {
-                return res.sendStatus(404);
-            }
-
-            //successfully deleted!  
+            await ColorSvc.delete(req.params.id);
             res.sendStatus(204);
         }
         catch (err) {
-            res.sendStatus(500);
+            console.log(err.message);
+            res.sendStatus(err.statusCode || 500);
         }
     }
 }
