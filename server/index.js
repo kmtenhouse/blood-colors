@@ -7,7 +7,8 @@ const http = require("http"),
   csp = require("helmet-csp"),
   session = require("express-session"),
   /*   cors = require("cors"), */
-  helmet = require("helmet");
+  helmet = require("helmet"),
+  exphbs = require("express-handlebars");
 
 module.exports = function () {
   let app = express(),
@@ -54,10 +55,10 @@ module.exports = function () {
     app.use(csp({
       directives: {
         defaultSrc: ["'self'"],  // default value for all directives that are absent
-        scriptSrc: ["'self'"],   // helps prevent XSS attacks
+        scriptSrc: ["code.jquery.com 'self'"],   // helps prevent XSS attacks
         frameAncestors: ["'none'"],  // helps prevent Clickjacking attacks
         imgSrc: ["'self'"],
-        styleSrc: ["'none'"]
+        styleSrc: ["'unsafe-inline' 'self'"]
       }
     }));
 
@@ -65,6 +66,10 @@ module.exports = function () {
     if (config.staticDir) {
       app.use(express.static(config.staticDir));
     }
+
+    //Set our view engine as handlebars, and the default layout as main
+    app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+    app.set("view engine", "handlebars");
 
     const sess = session(
       {
@@ -115,6 +120,9 @@ module.exports = function () {
     // Set up routes
     // ====== Routing ======
     app.use(routes);
+
+    // Catch all route
+    app.get("*", (req, res) => res.sendStatus(404));
 
     // Create a separate server for our app
     server = http.createServer(app);

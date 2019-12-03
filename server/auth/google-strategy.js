@@ -1,6 +1,6 @@
 "use strict";
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
-const User = require("../services/userService");
+const User = require("../services/user-service");
 
 module.exports = function (config) {
   if (!config.google_client_id || !config.google_client_secret) {
@@ -14,19 +14,19 @@ module.exports = function (config) {
   },
     async function (accessToken, refreshToken, profile, done) {
       try {
-        //find the first verified email
-        if(!Array.isArray(profile.emails) || profile.emails.length === 0) {
-          throw new Error("No emails received from google!");
+        //first, see if we already have this particular user:
+        const existingUser = await User.findOneByGoogleId(profile.id);
+ 
+        //if the user doesn't already exist, create them!
+        if(!existingUser) {
+            const createdUser = await User.create({ googleId: profile.id })
+            done(null, { _id: createdUser._id } );
+        } else {
+           //update our last log in time
+            existingUser.lastLogin = Date.now();
+            await existingUser.save();
+            done(null, { _id: existingUser._id } );
         }
-
-        //find the first verified email
-        const verifiedEmails = profile.emails.filter(email => email.verified);
-        if(verifiedEmails.length===0 || !verifiedEmails[0].value) {
-          throw new Error("No verified emails received from google!");
-        }
-
-        const currentUser = await User.findOrCreateViaEmail({ googleId: profile.id, email: verifiedEmails[0].value });
-        done(null, currentUser);
       }
       catch(err) {
         done(err, null);
