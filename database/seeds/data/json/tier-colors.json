@@ -1,0 +1,77 @@
+{
+    "model": "Color",
+    "documents": [
+        {
+            "name": "Rust Tier - Base Color",
+            "_id": "5d886724bd4b55584cbb1a8e",
+            "hex": "#a10000",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "Bronze Tier - Base Color",
+            "_id": "5d886798e30cef68a07b938b",
+            "hex": "#a25203",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "Gold Tier - Base Color",
+            "_id": "5d88657a25611954c019a6ad",
+            "hex": "#a1a100",
+            "contrastColor": "#000000"
+        },
+        {
+            "name": "Lime Tier - Base Color",
+            "_id": "5d886800b3c58968f873aace",
+            "hex": "#678900",
+            "contrastColor": "#000000"
+        },
+        {
+            "name": "Olive Tier - Base Color",
+            "_id": "5d88683ae13af45144bfa7a0",
+            "hex": "#3c7411",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "Jade Tier - Base Color",
+            "_id": "5d8868a85c832e6938e9d04c",
+            "hex": "#078446",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "Teal Tier - Base Color",
+            "_id": "5d8869164b88f61bf44945d0",
+            "hex": "#008788",
+            "contrastColor": "#000000"
+        },
+        {
+            "name": "Cerulean Tier - Base Color",
+            "_id": "5d88693d100f2b22f4262562",
+            "hex": "#1358a0",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "Blue Tier - Base Color",
+            "_id": "5d886990770d353cb0bb0ae3",
+            "hex": "#001694",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "Indigo Tier - Base Color",
+            "_id": "5d8869b6caedf44ce8dc5be1",
+            "hex": "#4d0c95",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "Violet Tier - Base Color",
+            "_id": "5d886a14faf4b90c94d30a66",
+            "hex": "#811181",
+            "contrastColor": "#FFFFFF"
+        },
+        {
+            "name": "Fuchsia Tier - Base Color",
+            "_id": "5d886a40f3e24243188946d0",
+            "hex": "#a80e66",
+            "contrastColor": "#FFFFFF"
+        }
+    ]
+}

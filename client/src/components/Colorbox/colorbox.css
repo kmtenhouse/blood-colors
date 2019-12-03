@@ -1,6 +1,6 @@
 .colorbox {
-    height: 120px;
-    width: 110px;
+    height: 119px;
+    width: 119px;
     border: 1px solid black;
     text-align: center;
     text-overflow: ellipsis;
@@ -37,6 +37,7 @@
 }
 
 .colorbox__select {
+    width: 100%;
     background-color: inherit;
     color: inherit;
     text-align: center;
@@ -45,8 +46,7 @@
 }
 
 .colorbox__option {
-    background-color: white;
-    color: black
+   padding: 0.25em;
 }
 
  .colorbox__label {

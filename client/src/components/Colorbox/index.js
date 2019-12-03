@@ -1,40 +1,40 @@
 import React from 'react';
 import './colorbox.css';
-import { textContrast } from '../../utils/hex-conversion';
 
 
 function Colorbox(props) {
-  const hex = "#" + (props.color.hasOwnProperty('hex') ? props.color.hex : "FFFFFF");
-  const contrastingColor = "#" + textContrast(hex);
-  
+  const { _id, name, hex, contrastColor } = props.color;
+  const tiers = (props.tiers ? props.tiers : []);
+  const showLock = (props.onLock ? true : false);
+
   let style = {
     backgroundColor: hex,
-    color: contrastingColor
+    color: contrastColor
   };
 
   let selectStyle = {
-    borderColor: contrastingColor
+    borderColor: contrastColor
   };
-
-  const materialIcon = ((props.color.hasOwnProperty('definesCaste') && props.color.definesCaste === true) ? 'lock' : 'lock_open');
-  const materialIconClasses = "material-icons " + (contrastingColor === "#FFFFFF" ? "md-light" : "md-dark") + ((props.color.hasOwnProperty('definesCaste') && props.color.definesCaste === true) ? "" : " md-inactive");
 
   return (
     <div className="colorbox" style={style}>
       <ul className="colorbox__info">
-        <li className="colorbox__label">{(props.color.hasOwnProperty('name') ? props.color.name : '')}</li>
-        <li className="colorbox__label"> {(props.color.hasOwnProperty('hex') ? props.color.hex : '')}</li> 
-        <li className="colorbox__label"><button onClick={(event)=>{props.handleLockToggle(event, props.color)}} className="colorbox__button"><i className={materialIconClasses}>{materialIcon}</i></button></li>
-        <select value={props.color.caste} className="colorbox__select" style={selectStyle} onChange={(event)=>{props.handleDropDown(event, props.color)}}>
-        { (props.hasOwnProperty('castes') && props.castes ? props.castes.map(currCaste => {
-          return(
-            <option className="colorbox__option" value={currCaste.name} key={currCaste._id} >{currCaste.name}</option>
-          );
-        } ) : '')}
-        <option className="colorbox__option" value="indeterminate">offspectrum</option>
-        </select>
-
-       
+        <li className="colorbox__label">{(name ? name : '')}</li>
+        <li className="colorbox__label"> {hex}</li>
+        {(showLock ? ( <li onClick={(event)=> { event.preventDefault(); props.onLock(props.color);}} className="colorbox__label"><i className="material-icons" style={style}>{(props.color.tier && props.color.tier!==-1 ? 'lock' : 'lock_open')}</i></li>) : '')}
+        {props.dropDownChange && tiers.length > 0 ? (
+          <li className="colorbox__label">
+            <select style={selectStyle} onChange={(event)=>{
+              event.preventDefault();
+              if(props.dropDownChange && event.target.value!==-2) {
+                props.dropDownChange(props.color, event.target.value);
+              }
+            }}>
+              <option value="-2">Select:</option>
+              <option value="-1">Pallete</option>
+              {tiers.map(currentTier => (<option key={_id + currentTier._id} value={currentTier._id}>{currentTier.name}</option>) )}
+            </select>
+          </li>) : ''}
       </ul>
     </div>
   );

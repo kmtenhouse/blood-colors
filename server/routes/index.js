@@ -1,10 +1,16 @@
 "use strict";
-
+const Tier = require("../../database/schema/tier");
 const router = require("express").Router();
 
-// If no API routes are hit, send the React app
-router.use((req, res) =>
-  res.sendFile(path.join(__dirname, "../client/build/index.html"))
-);
+const apiRoutes = require("./api");
+const authRoutes = require("./auth");
+
+router.get("/", async (req, res)=>{
+  const tiers = await Tier.find({}).sort([['order', 'ascending']]).populate("displayColor").populate("colors");
+  res.render("index", {tiers});
+});
+
+router.use("/api", apiRoutes);
+router.use("/auth", authRoutes);
 
 module.exports = router;

@@ -1,12 +1,10 @@
 import React from 'react';
 
 function Title(props) {
-    return(
-        <div className="row">
-            <div className="col-12">
-                <h2>{props.children}</h2>
-            </div>
-        </div>
+    return (
+        <React.Fragment>
+            <h2 className="spectrum__title">{props.children}</h2>
+        </React.Fragment>
     );
 }
 
