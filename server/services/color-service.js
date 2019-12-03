@@ -1,3 +1,4 @@
+"use strict";
 const Color = require("../../database/schema/color");
 const utils = require("../services/utils/hex-conversion");
 
