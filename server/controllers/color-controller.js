@@ -1,3 +1,4 @@
+"use strict";
 const ColorSvc = require("../services/color-service");
 
 module.exports = {

@@ -11,7 +11,7 @@ module.exports = {
         return Tier.findOne({ _id: id, user: userId }).populate('displayColor').populate('colors');
     },
     findAllByUser: function (userId) {
-        return Tier.find({ _id: userId }).populate('displayColor').populate('colors');
+        return Tier.find({ user: userId }).sort([['order', 'ascending']]).populate("displayColor").populate('colors');
     },
     create: function (obj) {
         return Tier.create(obj);
