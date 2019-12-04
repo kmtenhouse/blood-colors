@@ -10,7 +10,7 @@ router.get("/", tiersController.findAll);
 router.post("/", authenticationCheck, tiersController.create);
 
 //Id matches
-router.get("/:id", tiersController.findOneById)
+router.get("/:id", authenticationCheck, tiersController.findOneById)
 router.put("/:id", authenticationCheck, tiersController.updateOneById)
 router.delete("/:id", authenticationCheck, tiersController.delete);
 
