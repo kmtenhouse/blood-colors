@@ -1,8 +1,7 @@
 "use strict";
 const User = require("../../database/schema/user");
-const Tier = require("../../database/schema/tier");
+const Tier = require("../services/tier-service");
 const Promise = require("bluebird");
-const baseTiers = require("./utils/default-tiers");
 
 module.exports = {
     findOneById: function(id) {
@@ -22,21 +21,15 @@ module.exports = {
         //create a new user and then pre-populate with default hemospectrum tiers
         return new Promise(async (resolve, reject) => {
             try {
-                let newUser = await User.create(userObj);
-
-                //now, create each of the relevant Tiers (and map the new user's id to each one)
-                const newTierSet = baseTiers.map(tier => {
-                    const newTier = Object.assign({}, tier);
-                    newTier.user = newUser._id;
-                    return newTier;
-                });
-
-                const newTiers = await Tier.insertMany(baseTiers);
+                //first create a new user
+                const newUser = await User.create(userObj);
+                //create default tiers for this user
+                const newTiers = await Tier.createDefaultsForUser(newUser._id);
                 //update the new user to include the tiers we just created...
                 const tierIDs = newTiers.map(tier=> tier._id);
-                console.log(tierIDs);
                 newUser.tiers = tierIDs;
                 await newUser.save();
+                //and finally, return our fully put-together-user!
                 resolve(newUser);
             }
             catch(err) {
