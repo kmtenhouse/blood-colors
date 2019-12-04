@@ -1,5 +1,5 @@
 "use strict";
-const Tier = require("../../database/schema/tier");
+const Tier = require("../services/tier-service");
 const router = require("express").Router();
 
 const apiRoutes = require("./api");
@@ -7,9 +7,12 @@ const authRoutes = require("./auth");
 
 router.get("/", async (req, res) => {
   let tiers = [];
-  
-  if (req.user) {
-    tiers = await Tier.find({ user: req.user._id }).sort([['order', 'ascending']]).populate("displayColor").populate("colors");
+  console.log("Current user:")
+  console.log(req.user);
+
+  if (req.user && req.user._id) {
+    tiers = await Tier.findAllByUser(req.user._id);
+    console.log(tiers);
   } 
   res.render("index", { tiers });
 });

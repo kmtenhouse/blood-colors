@@ -15,22 +15,18 @@ module.exports = function (config) {
     async function (accessToken, refreshToken, profile, done) {
       try {
         //first, see if we already have this particular user:
-        const existingUser = await User.findOneByGoogleId(profile.id);
- 
+        let currentUser = await User.findOneByGoogleId(profile.id);
+
         //if the user doesn't already exist, create them!
-        if(!existingUser) {
-            const createdUser = await User.createWithTiers({ googleId: profile.id })
-            done(null, { _id: createdUser._id } );
-        } else {
-           //update our last log in time
-            existingUser.lastLogin = Date.now();
-            await existingUser.save();
-            done(null, { _id: existingUser._id } );
+        if (!currentUser) {
+          currentUser = await User.createWithTiers({ googleId: profile.id });
         }
+        
+        done(null, { _id: currentUser._id });
       }
-      catch(err) {
-        console.log("Failed to authenticate!");
-        done(err, null);
+      catch (err) {
+        console.log(err);
+        done(null, null);
       }
     }
   );

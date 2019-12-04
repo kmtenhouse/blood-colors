@@ -22,7 +22,7 @@ module.exports = {
         return new Promise(async (resolve, reject) => {
             try {
                 //first create a new user
-                const newUser = await User.create(userObj);
+                const newUser = new User(userObj);
                 //create default tiers for this user
                 const newTiers = await Tier.createDefaultsForUser(newUser._id);
                 //update the new user to include the tiers we just created...

@@ -5,13 +5,13 @@ const Promise = require("bluebird");
 
 module.exports = {
     findOneById: function (id) {
-        return Tier.findById(id);
+        return Tier.findById(id).populate('displayColor');
     },
     findOneByUserAndId: function (id, userId) {
-        return Tier.findOne({ _id: id, user: userId });
+        return Tier.findOne({ _id: id, user: userId }).populate('displayColor').populate('colors');
     },
     findAllByUser: function (userId) {
-        return Tier.find({ _id: userId });
+        return Tier.find({ _id: userId }).populate('displayColor').populate('colors');
     },
     create: function (obj) {
         return Tier.create(obj);
@@ -25,7 +25,7 @@ module.exports = {
                     newTier.user = userId;
                     return newTier;
                 });
-                const finishedTiers= await Tier.createMany(newTierSet);
+                const finishedTiers= await Tier.insertMany(newTierSet);
                 resolve(finishedTiers);
             }
             catch(err) {
