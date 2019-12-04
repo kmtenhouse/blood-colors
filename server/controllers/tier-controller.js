@@ -36,14 +36,20 @@ module.exports = {
             if (!req.body.hex || /^#?[0-9a-fA-F]{6}$/.test(req.body.hex)===false) {
                 return res.status(400).json({ error: "Must provide valid hex! (six digit version)" });
             }
-
-            //start assembling the "create" object
-            const newTierConfig = {};
+ 
+           //If there is no valid user id to associate the new color with
+            if(!req.user || !req.user._id) {
+                return res.status(403).json({ error: "Only authenticated users can create new tiers!"});
+            }
+ 
+            //start assembling the new tier:
+            const newTier = new Tier();
+            newTier.user = req.user._id; 
 
             //OPTIONS:
             //NAME:
             if (req.body.name === "" || typeof req.body.name === "string") {
-                newTierConfig.name = req.body.name;
+                newTier.name = req.body.name;
             } else if (req.body.name && typeof req.body.name !== "string") {
                 return res.status(400).json({ error: "Must provide a string for the new name!" });
             }
@@ -54,24 +60,25 @@ module.exports = {
                 if (Number.isNaN(parseFloat(req.body.order))) {
                     return res.status(400).json({ error: "Order must be a number!" });
                 }
-                newTierConfig.order = parseFloat(req.body.order);
+                newTier.order = parseFloat(req.body.order);
             }
 
             //TO-DO: optionally let you create a tier with an existing color to reference
 
             //CREATION:
             //Start by creating the color object for the tier's base color:
-            const newColorName = (newTierConfig.hasOwnProperty("name") ? newTierConfig.name.charAt(0).toUpperCase() + newTierConfig.name.slice(1).toLowerCase() : "");
+            const newColorName = (newTier.hasOwnProperty("name") ? newTierConfig.name.charAt(0).toUpperCase() + newTier.name.slice(1).toLowerCase() : "");
             const newColorHex = (/^#{1}/.test(req.body.hex) ? req.body.hex : "#" + req.body.hex) //make sure we always prefix the hex with a #
             const newColorContrast = "#" + getContrastColor(newColorHex);
             const newColor = await Color.create({ name: `${newColorName} Tier - Base Color`, hex: newColorHex, contrastColor: newColorContrast });
-            newTierConfig.displayColor = newColor._id;
+            newTier.displayColor = newColor._id;
 
-            //Finally, create the tier
-            const newTier = await Tier.create(newTierConfig);
+            //Finally, save the tier
+            await newTier.save();
             return res.status(200).json(newTier);
 
         } catch (err) {
+            console.log(err);
             return res.sendStatus(500);
         }
     },

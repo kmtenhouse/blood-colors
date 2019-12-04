@@ -3,19 +3,20 @@
 const router = require("express").Router();
 const tiersController = require("../../../controllers/tier-controller");
 const colorsController = require("../../../controllers/tier-colors-controller");
+const authenticationCheck = require("../../middleware/isAuthenticated").apiAuthCheck;
+
 //MAIN ROUTES
-//healthcheck route
 router.get("/", tiersController.findAll);
-router.post("/", tiersController.create);
+router.post("/", authenticationCheck, tiersController.create);
 
 //Id matches
 router.get("/:id", tiersController.findOneById)
-router.put("/:id", tiersController.updateOneById)
-router.delete("/:id", tiersController.delete);
+router.put("/:id", authenticationCheck, tiersController.updateOneById)
+router.delete("/:id", authenticationCheck, tiersController.delete);
 
 //remove and add individual colors
-router.post("/:id/colors/:colorid", colorsController.addOneColor)
-router.delete("/:id/colors/:colorid", colorsController.removeOneColor);
+router.post("/:id/colors/:colorid", authenticationCheck, colorsController.addOneColor)
+router.delete("/:id/colors/:colorid", authenticationCheck, colorsController.removeOneColor);
 
 //filters
 router.get("/filter/withcolors", tiersController.findAllWithColors);

@@ -5,6 +5,9 @@ module.exports = {
     findOneById: async function (req, res) {
         try {
             const result = await ColorSvc.findOneById(req.params.id);
+            if(result.user && result.user!==req.user) {
+                return res.status(403);
+            }
             res.status(200).json(result);
         }
         catch (err) {
