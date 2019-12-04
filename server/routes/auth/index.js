@@ -9,9 +9,9 @@ router.get("/", (req, res) => {
   res.send("AUTH ROUTES");
 });
 
-/* router.get("/whoami", (req, res) => {
-  res.json(req.user || { loggedOut: true});
-}); */
+router.get("/whoami", (req, res) => {
+  res.json(req.user || { loggedOut: true });
+});
 
 router.get("/logout", (req, res) => {
   req.logout();

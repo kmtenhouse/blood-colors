@@ -5,9 +5,13 @@ const router = require("express").Router();
 const apiRoutes = require("./api");
 const authRoutes = require("./auth");
 
-router.get("/", async (req, res)=>{
-  const tiers = await Tier.find({}).sort([['order', 'ascending']]).populate("displayColor").populate("colors");
-  res.render("index", {tiers});
+router.get("/", async (req, res) => {
+  let tiers = [];
+  
+  if (req.user) {
+    tiers = await Tier.find({ user: req.user._id }).sort([['order', 'ascending']]).populate("displayColor").populate("colors");
+  } 
+  res.render("index", { tiers });
 });
 
 router.use("/api", apiRoutes);

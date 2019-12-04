@@ -19,7 +19,7 @@ module.exports = function (config) {
  
         //if the user doesn't already exist, create them!
         if(!existingUser) {
-            const createdUser = await User.create({ googleId: profile.id })
+            const createdUser = await User.createWithTiers({ googleId: profile.id })
             done(null, { _id: createdUser._id } );
         } else {
            //update our last log in time
@@ -29,6 +29,7 @@ module.exports = function (config) {
         }
       }
       catch(err) {
+        console.log("Failed to authenticate!");
         done(err, null);
       }
     }
